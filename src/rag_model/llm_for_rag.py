@@ -1,0 +1,1 @@
+# get context from company docs to aid draft of email
