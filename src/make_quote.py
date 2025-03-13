@@ -10,20 +10,23 @@ import re
 load_dotenv()
 HUGGING_FACE_API = os.getenv("HUGGING_FACE_API")
 
+def clean_text(text):
+    return text.encode("latin-1", "ignore").decode("latin-1")  # Removes unsupported characters
+
 def generate_pdf(text):
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
     pdf.set_font("Arial", size=12)
-    pdf.multi_cell(0, 10, text)
+    
+    cleaned_text = clean_text(text)
+    pdf.multi_cell(0, 10, cleaned_text)
+    
     pdf_output = "response.pdf"
     pdf.output(pdf_output)
     return pdf_output
 
-def generate_quote(template_pdf, client_email, product_catalog_text):
-
-    # Extract the text from the uploaded template PDF
-    template_text = extract_pdf_text(template_pdf)
+def generate_quote(template_text, client_email, product_catalog_text):
 
     # Define the system message for the agent (context)
     messages = [
@@ -56,5 +59,5 @@ def generate_quote(template_pdf, client_email, product_catalog_text):
     
     # Get the model's response
     ai_msg = chat_model.invoke(messages)
-
+    print(ai_msg.content)
     return generate_pdf(ai_msg.content)
