@@ -17,15 +17,20 @@ def determine_action(email):
     messages = [
         SystemMessage(content=
             """
-            You are a master agent whose job is to determine whether a quote should be generated
-            The aim of this task is to aid technical salespeople in responding to customer emails. 
-            You will read the email provided and determine what action should be taken.
-            You have 2 options:
-            a1) Take no action - this email does not need a quote to be generated.
-            b2) Make a quote - the customer has asked for a quote to be generated, or it would be useful to provide one.
+            You are an AI assistant helping technical salespeople. 
+            Your task is to determine if a quote should be generated based on the customer's email.
 
-            Determine the action and respond with a single word to signal your response: 'a1' or 'b2'.  
-            You must only respond with a single word, 'a1' or 'b2', no exceptions!
+            Instructions:
+            - Respond with only 'a1' (no quote needed) or 'b2' (quote should be generated).
+            - No extra text, explanations, or punctuation.
+            - If unsure, default to 'a1'.
+            
+            Example:
+            Email: "Can you provide a quote for 10 units?"
+            Response: b2
+            
+            Email: "Thanks for your help."
+            Response: a1
             """
         ),
         HumanMessage(
@@ -47,8 +52,9 @@ def get_action_from_response(model_output):
     if match:
         return match.group(0)
     else:
+        print("No valid action found")
         # If no valid action is found, return a default action or raise an error
-        return 'No valid action found'
+        return 'a1'
     
 
 # You are a master agent whose job is to determine which subtask should be started. 
