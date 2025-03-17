@@ -1,10 +1,12 @@
+fix user can remove and view docs in company history
 Improve UI
 handle lots of docs
-user can remove and view docs in company history
+
 add to streamlit comunity cloud
 shut down aws
 Add openai key
 Show Abdi
+Handle companies whos email isn't company specific
 Get him to set up google cloud and OpenAI key
 shut down cloud
 Send out
