@@ -1,1 +1,4 @@
 .env
+.secrets
+.secrets\veloflow-4b4bc-firebase-adminsdk-fbsvc-0a59ddf78d.json
+.veloflow-4b4bc-firebase-adminsdk-fbsvc-0a59ddf78d.json
