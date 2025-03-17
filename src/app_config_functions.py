@@ -6,7 +6,7 @@ from firebase_admin import auth, credentials, firestore
 
 # Initialize Firebase
 if not firebase_admin._apps:
-    cred = credentials.Certificate("secrets/veloflow-4b4bc-firebase-adminsdk-fbsvc-0a59ddf78d.json")  # Replace with your actual path
+    cred = credentials.Certificate("secrets/veloflow-4b4bc-firebase-adminsdk-fbsvc-0a59ddf78d.json") 
     firebase_admin.initialize_app(cred)
 
 db = firestore.client()
@@ -44,7 +44,7 @@ def upload_quote_template(company, uploaded_file):
     existing_template = get_existing_quote_template(company)
 
     if existing_template:
-        st.error("A quote template already exists. Please remove it before uploading a new one.")
+        st.success("A quote template already exists. Please remove it before uploading a new one.")
         return
 
     template_text = extract_pdf_text(uploaded_file)
@@ -55,6 +55,10 @@ def upload_quote_template(company, uploaded_file):
 def delete_quote_template(company):
     db.collection("quote_templates").document(company).delete()
     st.success("Quote template deleted successfully!")
+
+def delete_company_doc(company, doc_name):
+    db.collection("company_documents").document(company).get(doc_name).delete()
+    st.success("Document deleted successfully!")
 
 def authenticate_user(email):
     try:

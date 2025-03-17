@@ -6,7 +6,7 @@ from PyPDF2 import PdfReader
 import os
 import time
 from src.app_config_functions import *
-    
+
 if "logged_in" not in st.session_state:
     st.session_state["logged_in"] = False
 
@@ -81,6 +81,24 @@ else:
         uploaded_files = st.file_uploader("Upload PDFs", type=["pdf"], accept_multiple_files=True)
         if st.button("Upload Company Documents") and uploaded_files:
             upload_company_documents(company, uploaded_files)
+
+        # List uploaded documents with options to delete
+        st.subheader("Uploaded Company Documents")
+        docs_ref = db.collection("company_docs").document(company).get()
+
+        # Check if the document exists
+        if docs_ref.exists:
+            # Get all fields as a dictionary
+            doc_data = docs_ref.to_dict()
+
+            doc_names = [field for field, value in doc_data.items()]
+
+            selected_doc = st.selectbox("Select a document to delete", options=doc_names)
+
+            if selected_doc:
+                if st.button("Remove Document"):
+                    if st.button("Click here if sure you want to remove this document?"):
+                        delete_company_doc(company, selected_doc)
 
         # Quote Template Upload (Limited to One)
         st.subheader("Upload Quote Template")
