@@ -4,17 +4,8 @@ from src.draft_email_agent import generate_response, extract_pdf_text
 from src.make_quote import generate_quote
 from PyPDF2 import PdfReader
 import os
-import firebase_admin
-from firebase_admin import auth, credentials, firestore
 import time
 from src.app_config_functions import *
-
-# Initialize Firebase
-if not firebase_admin._apps:
-    cred = credentials.Certificate("secrets/veloflow-4b4bc-firebase-adminsdk-fbsvc-0a59ddf78d.json")  # Replace with your actual path
-    firebase_admin.initialize_app(cred)
-
-db = firestore.client()
     
 if "logged_in" not in st.session_state:
     st.session_state["logged_in"] = False

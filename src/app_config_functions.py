@@ -1,7 +1,15 @@
 import streamlit as st
 from src.draft_email_agent import extract_pdf_text
 from PyPDF2 import PdfReader
-from firebase_admin import auth
+import firebase_admin
+from firebase_admin import auth, credentials, firestore
+
+# Initialize Firebase
+if not firebase_admin._apps:
+    cred = credentials.Certificate("secrets/veloflow-4b4bc-firebase-adminsdk-fbsvc-0a59ddf78d.json")  # Replace with your actual path
+    firebase_admin.initialize_app(cred)
+
+db = firestore.client()
 
 # Function to extract text from PDFs
 def extract_pdf_text(uploaded_file):
