@@ -41,13 +41,11 @@ def generate_response(email, product_catalog_text):
         )),
         HumanMessage(content=f"Product Catalog:\n{product_catalog_text}\n\nCustomer Email:\n{email}"),
     ]
-    print(messages)
-    print("--------------------")
     # Load the model and chat agent
     model = HuggingFaceEndpoint(repo_id="HuggingFaceH4/zephyr-7b-beta", task="text-generation", huggingfacehub_api_token=HUGGING_FACE_API)
     chat_model = ChatHuggingFace(llm=model)
     
     # Get the model's response
     ai_msg = chat_model.invoke(messages)
-
+    print(ai_msg)
     return ai_msg.content
