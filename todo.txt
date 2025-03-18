@@ -1,18 +1,21 @@
-fix user can remove and view docs in company history
+Switch to supabase
 Improve UI
-handle lots of docs
-
 add to streamlit comunity cloud
+
+handle lots of docs (maybe for now)
+Add openai key
+
 shut down aws
+shut down firestore google
 Add openai key
 Show Abdi
-Handle companies whos email isn't company specific
 Get him to set up google cloud and OpenAI key
 shut down cloud
 Send out
+improve security
 
 
 Costs
-LLM API key
-Firestore auth - free
+LLM API key - GPT4o-mini
+supabase - free
 aws s3
