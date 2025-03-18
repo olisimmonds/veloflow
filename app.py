@@ -1,9 +1,10 @@
+import os
+os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 import streamlit as st
 from src.master_agent import determine_action, get_action_from_response
 from src.draft_email_agent import generate_response
 from src.make_quote import generate_quote
 from PyPDF2 import PdfReader
-import os
 import time
 from src.app_config_functions import get_company_documents, upload_file_to_supabase, delete_company_doc, authenticate_user, extract_pdf_text
 
