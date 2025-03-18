@@ -1,5 +1,4 @@
 from fpdf import FPDF
-from src.draft_email_agent import extract_pdf_text
 import io
 from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint, HuggingFacePipeline
 from langchain_core.messages import HumanMessage, SystemMessage

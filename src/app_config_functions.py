@@ -1,69 +1,77 @@
 import streamlit as st
-from src.draft_email_agent import extract_pdf_text
 from PyPDF2 import PdfReader
-import firebase_admin
-from firebase_admin import auth, credentials, firestore
+import requests
+from io import BytesIO
+import os
+from dotenv import load_dotenv
+import json
+from supabase import create_client, Client
+import tempfile
 
-# Initialize Firebase
-if not firebase_admin._apps:
-    cred = credentials.Certificate("secrets/veloflow-4b4bc-firebase-adminsdk-fbsvc-0a59ddf78d.json") 
-    firebase_admin.initialize_app(cred)
+load_dotenv()
+users = json.loads(os.getenv("users"))
 
-db = firestore.client()
+# Initialize Supabase
+SUPABASE_URL = os.getenv("supabase_url")
+SUPABASE_KEY = os.getenv("supabase_api_key")
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-# Function to extract text from PDFs
-def extract_pdf_text(uploaded_file):
-    pdf_reader = PdfReader(uploaded_file)
-    return "\n".join([page.extract_text() for page in pdf_reader.pages if page.extract_text()])
-
-# Function to fetch company documents
-def get_company_documents(company):
-    docs_ref = db.collection("company_docs").document(company).get()
-    if docs_ref.exists:
-        return docs_ref.to_dict().get("product_catalog", "")
-    return ""
-
-# Function to get the existing quote template
-def get_existing_quote_template(company):
-    template_ref = db.collection("quote_templates").document(company).get()
-    if template_ref.exists:
-        return template_ref.to_dict().get("template_text", "")
-    return None
-
-# Function to upload company documents
-def upload_company_documents(company, uploaded_files):
-    combined_text = ""
-    for file in uploaded_files:
-        combined_text += extract_pdf_text(file) + "\n"
-
-    db.collection("company_docs").document(company).set({"product_catalog": combined_text})
-    st.success("Company documents uploaded successfully!")
-
-# Function to upload a quote template (Limited to one per company)
-def upload_quote_template(company, uploaded_file):
-    existing_template = get_existing_quote_template(company)
-
-    if existing_template:
-        st.success("A quote template already exists. Please remove it before uploading a new one.")
-        return
-
-    template_text = extract_pdf_text(uploaded_file)
-    db.collection("quote_templates").document(company).set({"template_text": template_text})
-    st.success("Quote template uploaded successfully!")
-
-# Function to delete an existing quote template
-def delete_quote_template(company):
-    db.collection("quote_templates").document(company).delete()
-    st.success("Quote template deleted successfully!")
-
-def delete_company_doc(company, doc_name):
-    db.collection("company_documents").document(company).get(doc_name).delete()
-    st.success("Document deleted successfully!")
+BUCKET_NAME = "veloflow-company-docs"
 
 def authenticate_user(email):
-    try:
-        user = auth.get_user_by_email(email)
-        st.session_state["user"] = user.email
-        return user.email
-    except Exception as e:
-        return False
+    if email in users:
+        return email, users[email]
+    else: return False, False
+
+def extract_pdf_text(file_source):
+    if isinstance(file_source, str):  # Check if it's a URL
+        response = requests.get(file_source)
+        if response.status_code == 200:
+            file_source = BytesIO(response.content)  # Convert to a file-like object
+        else:
+            raise ValueError(f"Failed to fetch PDF from {file_source}, Status Code: {response.status_code}")
+
+    pdf_reader = PdfReader(file_source)
+    return "\n".join([page.extract_text() for page in pdf_reader.pages if page.extract_text()])
+
+
+# Function to upload files to Supabase Storage
+def upload_file_to_supabase(company, type, uploaded_file):
+    file_extension = os.path.splitext(uploaded_file.name)[1]
+    file_path = f"{company}/{type}/{uploaded_file.name}"
+    # Save file to a temporary location
+    with tempfile.NamedTemporaryFile(delete=False, suffix=file_extension) as temp_file:
+        temp_file.write(uploaded_file.getbuffer())
+        temp_filename = temp_file.name
+
+    with open(temp_filename, "rb") as f:
+        res = supabase.storage.from_(BUCKET_NAME).upload(file_path, f, {"content-type": "application/pdf"})
+
+    os.remove(temp_filename)
+
+    if res:
+        st.success(f"File '{uploaded_file.name}' uploaded successfully!")
+    else:
+        st.error("Failed to upload file.")
+
+# Function to fetch files for a company
+def get_company_documents(company, type, for_display = False):
+    res = supabase.storage.from_(BUCKET_NAME).list(f"{company}/{type}")
+
+    if res:
+        if for_display:
+            file_links = [f"{company}/{type}/{file['name']}" for file in res]
+            return file_links
+        else: 
+            file_links = [supabase.storage.from_(BUCKET_NAME).get_public_url(f"{company}/{type}/{file['name']}") for file in res]
+            return file_links
+    return []
+
+# Function to delete a file
+def delete_company_doc(file_path):
+    res = supabase.storage.from_(BUCKET_NAME).remove([file_path])
+    if res:
+        st.success(f"Document '{file_path}' deleted successfully!")
+    else:
+        st.error("Failed to delete document.")
+

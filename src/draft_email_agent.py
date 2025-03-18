@@ -13,13 +13,13 @@ HUGGING_FACE_API = os.getenv("HUGGING_FACE_API")
 
 # Function to extract text from the PDF product catalog
 # @cache # Commented out for now cus want to make sure we pull info from template and catalog
-def extract_pdf_text(pdf_path):
-    with open(pdf_path, 'rb') as file:
-        reader = PyPDF2.PdfReader(file)
-        text = ""
-        for page in reader.pages:
-            text += page.extract_text()
-    return text
+# def extract_pdf_text(pdf_path):
+#     with open(pdf_path, 'rb') as file:
+#         reader = PyPDF2.PdfReader(file)
+#         text = ""
+#         for page in reader.pages:
+#             text += page.extract_text()
+#     return text
 
 # Function to generate a response based on customer email and the product catalog
 def generate_response(email, product_catalog_text):
