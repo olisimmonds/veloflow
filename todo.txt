@@ -1,16 +1,15 @@
-Improve UI
+Improve UI - cols and text boxes
 add to streamlit comunity cloud
 
+show abdi
 handle lots of docs (maybe for now)
 Add openai key
+pdf generation
 
 delete KMP_DUPLICATE_LIB_OK line and fix error
 shut down aws
 shut down firestore google
-Add openai key
-Show Abdi
-Get him to set up google cloud and OpenAI key
-shut down cloud
+upgrade supabase? 
 Send out
 improve security
 
