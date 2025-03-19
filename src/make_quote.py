@@ -1,4 +1,5 @@
 from fpdf import FPDF
+import streamlit as st
 import io
 from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint, HuggingFacePipeline
 from langchain_core.messages import HumanMessage, SystemMessage
@@ -6,8 +7,10 @@ import os
 from dotenv import load_dotenv
 import re
 
-load_dotenv()
-HUGGING_FACE_API = os.getenv("HUGGING_FACE_API")
+# load_dotenv()
+# HUGGING_FACE_API = os.getenv("HUGGING_FACE_API")
+HUGGING_FACE_API = st.secrets["HUGGING_FACE_API"]
+
 
 def clean_text(text):
     return text.encode("latin-1", "ignore").decode("latin-1")  # Removes unsupported characters

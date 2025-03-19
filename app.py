@@ -6,6 +6,7 @@ import streamlit as st
 
 st.set_page_config(
     layout="wide",
+    page_title="Veloflow",
     page_icon="static/background.jpg"  # Path to your icon image
 )
 

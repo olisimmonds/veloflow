@@ -1,4 +1,5 @@
 # Determin action
+import streamlit as st
 from langchain.prompts import PromptTemplate
 from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint, HuggingFacePipeline
 
@@ -8,9 +9,11 @@ import os
 from dotenv import load_dotenv
 import re
 
-load_dotenv()
-HUGGING_FACE_API = os.getenv("HUGGING_FACE_API")
-OPEN_AI_API = os.getenv("OPEN_AI_API")
+# load_dotenv()
+# HUGGING_FACE_API = os.getenv("HUGGING_FACE_API")
+HUGGING_FACE_API = st.secrets["HUGGING_FACE_API"]
+
+# OPEN_AI_API = os.getenv("OPEN_AI_API")
 
 def determine_action(email):
 
