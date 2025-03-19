@@ -218,7 +218,6 @@ python-slugify
 pytoolconfig
 pytz
 pyuca
-pywinpty
 PyYAML
 pyzmq
 QDarkStyle
