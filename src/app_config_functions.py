@@ -8,12 +8,16 @@ import json
 from supabase import create_client, Client
 import tempfile
 
-load_dotenv()
-users = json.loads(os.getenv("users"))
+# load_dotenv()
+# users = json.loads(os.getenv("users"))
+users = json.loads(st.secrets["users"])
 
 # Initialize Supabase
-SUPABASE_URL = os.getenv("supabase_url")
-SUPABASE_KEY = os.getenv("supabase_api_key")
+# SUPABASE_URL = os.getenv("supabase_url")
+# SUPABASE_KEY = os.getenv("supabase_api_key")
+SUPABASE_URL = st.secrets["supabase_url"]
+SUPABASE_KEY = st.secrets["supabase_api_key"]
+
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 BUCKET_NAME = "veloflow-company-docs"

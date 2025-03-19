@@ -1,4 +1,5 @@
 import PyPDF2
+import streamlit as st
 from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint, HuggingFacePipeline
 
 from langchain_core.messages import HumanMessage, SystemMessage
@@ -8,8 +9,9 @@ import os
 from dotenv import load_dotenv
 import re
 
-load_dotenv()
-HUGGING_FACE_API = os.getenv("HUGGING_FACE_API")
+# load_dotenv()
+# HUGGING_FACE_API = os.getenv("HUGGING_FACE_API")
+HUGGING_FACE_API = st.secrets["HUGGING_FACE_API"]
 
 # Function to extract text from the PDF product catalog
 # @cache # Commented out for now cus want to make sure we pull info from template and catalog
