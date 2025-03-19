@@ -24,7 +24,7 @@ from src.draft_email_agent import generate_response
 from src.make_quote import generate_quote
 from PyPDF2 import PdfReader
 import time
-from src.app_config_functions import get_company_documents, upload_file_to_supabase, delete_company_doc, authenticate_user, extract_pdf_text
+from src.app_config_functions import get_company_documents, upload_file_to_supabase, delete_company_doc, authenticate_user, extract_pdf_text, extract_filenames
 from PIL import Image
 from pathlib import Path
 
@@ -39,6 +39,9 @@ if 'confirm_del' not in st.session_state:
 
 if 'confirm_del_of_quote' not in st.session_state:
     st.session_state.confirm_del_of_quote = False
+
+if "force_quote_gen" not in st.session_state:
+    st.session_state.force_quote_gen = False
 
 message = st.empty()
 
@@ -148,40 +151,49 @@ else:
 
         email_text = st.text_area("Paste the customer's email below:")
 
-        if st.button("Generate Response"):
-            if not st.session_state["generating_email"]:
-                message.empty()
-                st.session_state["generating_email"] = True
-                if email_text:
-                    action = get_action_from_response(determine_action(email_text))
-                    product_catalog_text = [extract_pdf_text(link) for link in get_company_documents(company, "company_docs")]
-                    quote_template = get_company_documents(company, "quote_template")
+        # existing_template = get_company_documents(company, "quote_template", True)
+        cols_for_gen = st.columns([1, 3])
+        with cols_for_gen[0]:
+            if st.button("Generate Response"):
+                if not st.session_state["generating_email"]:
+                    message.empty()
+                    st.session_state["generating_email"] = True
+                    if email_text:
+                        action = get_action_from_response(determine_action(email_text))
+                        product_catalog_text = [extract_pdf_text(link) for link in get_company_documents(company, "company_docs")]
+                        quote_template = get_company_documents(company, "quote_template")
 
-                    if action == 'b2' and len(quote_template)>0:
-                        template_text = extract_pdf_text(quote_template[0])
-                        st.info("Generating a quote...")
-                        response_text = generate_response(email_text, product_catalog_text)
-                        st.text(response_text)
-                        pdf_file = generate_quote(template_text, email_text, product_catalog_text)
-                        st.download_button(label="Download Quote as PDF", data=open(pdf_file, "rb"), file_name="quote.pdf", mime="application/pdf")
-                        
+                        if action == 'b2' and len(quote_template)>0 or st.session_state.force_quote_gen:
+                            template_text = extract_pdf_text(quote_template[0])
+                            st.info("Generating a quote...")
+                            response_text = generate_response(email_text, product_catalog_text)
+                            st.text(response_text)
+                            pdf_file = generate_quote(template_text, email_text, product_catalog_text)
+                            st.download_button(label="Download Quote as PDF", data=open(pdf_file, "rb"), file_name="quote.pdf", mime="application/pdf")
+                            
+                        else:
+                            response_text = generate_response(email_text, product_catalog_text)
+                            st.text(response_text)
                     else:
-                        response_text = generate_response(email_text, product_catalog_text)
-                        st.text(response_text)
-                else:
-                    st.error("Please paste an email to generate a response.")
-                st.session_state["generating_email"] = False
-            else: 
-                message.markdown("<h3 style='color:red;'>Please only press 'Generate Response' once. \nWait a few seconds and then the button will become available again.</h3>", unsafe_allow_html=True)
-                time.sleep(2)
-                message.empty()
-                st.session_state["generating_email"] = False
-                message.markdown("<h3 style='color:red;'>Try again now</h3>", unsafe_allow_html=True)
-
+                        st.error("Please paste an email to generate a response.")
+                    st.session_state["generating_email"] = False
+                else: 
+                    message.markdown("<h3 style='color:red;'>Please only press 'Generate Response' once. \nWait a few seconds and then the button will become available again.</h3>", unsafe_allow_html=True)
+                    time.sleep(2)
+                    message.empty()
+                    st.session_state["generating_email"] = False
+                    message.markdown("<h3 style='color:red;'>Try again now</h3>", unsafe_allow_html=True)
+        
+        with cols_for_gen[1]:
+            st.session_state.force_quote_gen = st.toggle("Force Quote Generation")
+            existing_template = get_company_documents(company, "quote_template", True)
+            if len(existing_template)==0 and st.session_state.force_quote_gen:
+                st.info("For improved quote generation, upload a quote.")
+    
     with cols_main_page[2]:
         
         # Company Documents Upload
-        st.title("Upload Company Documents")
+        st.title("Company Documents and Product Catalogues")
 
         cols_right_side = st.columns([3,2])
         with cols_right_side[0]:
@@ -198,32 +210,33 @@ else:
 
         # Check if the document exists
         if len(company_doc_links)>0:
-            
-            selected_doc = st.selectbox("Select a document to delete", label_visibility = "collapsed", options=company_doc_links)
-        
-            if selected_doc:
-                if st.session_state.confirm_del == False:
-                    if st.button("Delete selceted company document"):
-                        st.session_state.confirm_del = True
-                        st.rerun()
+            file_names_to_display = extract_filenames(company_doc_links)
+            cols_for_doc_selector = st.columns(2)
+            with cols_for_doc_selector[0]:
+                selected_doc = st.selectbox("Select a document to delete", label_visibility = "collapsed", options=file_names_to_display)
+            with cols_for_doc_selector[1]:
+                if selected_doc:
+                    if st.session_state.confirm_del == False:
+                        if st.button("Delete selceted company document"):
+                            st.session_state.confirm_del = True
+                            st.rerun()
 
-                # Check if confirm_del is True
-                if st.session_state.confirm_del:
-                    cols3 = st.columns(4)
-                    with cols3[0]:
+                    # Check if confirm_del is True
+                    if st.session_state.confirm_del:
+                        
                         if st.button("Confirm delete"):
                             delete_company_doc(f"{selected_doc}")
                             st.session_state.confirm_del = False  # Reset the confirmation state
                             st.info(f"Document '{selected_doc}' deleted successfully!")
                             st.rerun()
-                    with cols3[1]:
+                    
                         if st.button("Cancel"):
                             st.session_state.confirm_del = False  # Reset the confirmation state
                             st.info(f"Document deletion of '{selected_doc}' cancelled.")
                             st.rerun()
             
         # Quote Template Upload (Limited to One)
-        st.title("Upload Quote Template")
+        st.title("Upload Quote Template / Previous Quote")
         existing_template = get_company_documents(company, "quote_template", True)
 
         if len(existing_template)>0:

@@ -1,8 +1,7 @@
-show abdi
-handle lots of docs (maybe for now)
-Add openai key
-pdf generation
-improve UI
+handle lots of docs - try alibaba gte large en 1.5 with steam embedding, documents embeded as uploaded, id to delete
+    \_Add openai key - count token length, try llama 3.3, if not get abdi to pay for gpt 4o mini
+        \_pdf generation
+            \_Show andy and abdis account manager
 
 delete KMP_DUPLICATE_LIB_OK line and fix error
 shut down aws
@@ -10,7 +9,12 @@ shut down firestore google
 upgrade supabase? 
 Send out
 improve security
+improve auth - move to supabase auth
+Implement payment with strip
+LLM to search internet
+Improve UI - move away from streamlit?
 
+Testing - does it handle pdfs well, same format, can be given templates or previous quotes
 
 Costs
 LLM API key - GPT4o-mini

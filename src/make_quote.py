@@ -3,13 +3,9 @@ import streamlit as st
 import io
 from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint, HuggingFacePipeline
 from langchain_core.messages import HumanMessage, SystemMessage
-import os
-from dotenv import load_dotenv
-import re
+import params
 
-# load_dotenv()
-# HUGGING_FACE_API = os.getenv("HUGGING_FACE_API")
-HUGGING_FACE_API = st.secrets["HUGGING_FACE_API"]
+HUGGING_FACE_API = params.HUGGING_FACE_API
 
 
 def clean_text(text):
@@ -35,14 +31,15 @@ def generate_quote(template_text, client_email, product_catalog_text):
         SystemMessage(content=(
             f"""
             You are an assistant for a technical sales team. Your task is to generate a quote based on the provided template by filling in the necessary details using information from the customer's email and the product catalog.
-
+            The quote provided may be template for which you should fill in the blanks, or it may be a previous quote, in which case you should determin want information needs to be updates. 
+            
             Instructions:
             - Use the email provided below to understand the customer's needs, including any specific product requests or pricing inquiries.
-            - Use the product catalog provided to identify relevant products or services that match the customer's needs.
-            - The quote should follow the provided template exactly, filling in the blanks with appropriate details:
+            - Use the company context provided to identify relevant products or services that match the customer's needs.
+            - The quote should follow the provided template exactly, filling in the blanks, or replacing the feilds which need updating with appropriate details:
             - Do not add any extra content beyond what is specified in the template.
 
-            Here is the product catalog:
+            Here is the company context:
             {product_catalog_text}
 
             Here is the customer's email:
@@ -56,7 +53,9 @@ def generate_quote(template_text, client_email, product_catalog_text):
     ]
     
     # Load the model and chat agent
-    model = HuggingFaceEndpoint(repo_id="HuggingFaceH4/zephyr-7b-beta", task="text-generation", huggingfacehub_api_token=HUGGING_FACE_API)
+    # model_repo = "meta-llama/Llama-3.3-70B-Instruct"
+    model_repo = "HuggingFaceH4/zephyr-7b-beta"
+    model = HuggingFaceEndpoint(repo_id=model_repo, task="text-generation", huggingfacehub_api_token=HUGGING_FACE_API)
     chat_model = ChatHuggingFace(llm=model)
     
     # Get the model's response

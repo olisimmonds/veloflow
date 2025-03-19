@@ -3,20 +3,15 @@ from PyPDF2 import PdfReader
 import requests
 from io import BytesIO
 import os
-from dotenv import load_dotenv
 import json
 from supabase import create_client, Client
 import tempfile
+import params
+from typing import List
 
-# load_dotenv()
-# users = json.loads(os.getenv("users"))
-users = json.loads(st.secrets["users"])
-
-# Initialize Supabase
-# SUPABASE_URL = os.getenv("supabase_url")
-# SUPABASE_KEY = os.getenv("supabase_api_key")
-SUPABASE_URL = st.secrets["supabase_url"]
-SUPABASE_KEY = st.secrets["supabase_api_key"]
+users = params.users
+SUPABASE_URL = params.SUPABASE_URL
+SUPABASE_KEY = params.SUPABASE_KEY
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
@@ -26,6 +21,9 @@ def authenticate_user(email):
     if email in users:
         return email, users[email]
     else: return False, False
+
+def extract_filenames(directories: List[str]) -> List[str]:
+    return [path.split('/')[-1].split('.')[0] for path in directories]
 
 def extract_pdf_text(file_source):
     if isinstance(file_source, str):  # Check if it's a URL
