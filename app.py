@@ -24,7 +24,7 @@ from src.draft_email_agent import generate_response
 from src.make_quote import generate_quote
 from PyPDF2 import PdfReader
 import time
-from src.app_config_functions import get_company_documents, upload_file_to_supabase, delete_company_doc, authenticate_user, extract_pdf_text, extract_filenames
+from src.app_config_functions import get_company_documents, upload_file_to_supabase, delete_company_doc, authenticate_user, extract_pdf_text, extract_filenames, retrieve_relevant_context
 from PIL import Image
 from pathlib import Path
 
@@ -160,7 +160,7 @@ else:
                     st.session_state["generating_email"] = True
                     if email_text:
                         action = get_action_from_response(determine_action(email_text))
-                        product_catalog_text = [extract_pdf_text(link) for link in get_company_documents(company, "company_docs")]
+                        product_catalog_text = retrieve_relevant_context(company, "company_docs", email_text, word_limit=2000)
                         quote_template = get_company_documents(company, "quote_template")
 
                         if action == 'b2' and len(quote_template)>0 or st.session_state.force_quote_gen:
@@ -225,7 +225,8 @@ else:
                     if st.session_state.confirm_del:
                         
                         if st.button("Confirm delete"):
-                            delete_company_doc(f"{selected_doc}")
+                            print(f"{company}/company_docs/{selected_doc}")
+                            delete_company_doc(f"{company}/company_docs/{selected_doc}")
                             st.session_state.confirm_del = False  # Reset the confirmation state
                             st.info(f"Document '{selected_doc}' deleted successfully!")
                             st.rerun()

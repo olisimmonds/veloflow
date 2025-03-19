@@ -293,6 +293,7 @@ Unidecode
 uri-template
 uritemplate==4.1.1
 urllib3
+validators
 watchdog
 wcwidth
 webcolors
@@ -307,3 +308,7 @@ yapf
 yarl
 zipp
 zstandard==0.23.0
+pytorch 
+torchvision 
+torchaudio 
+cudatoolkit
