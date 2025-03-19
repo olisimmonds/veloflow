@@ -12,6 +12,7 @@ from typing import List
 import torch.nn.functional as F
 from transformers import AutoModel, AutoTokenizer
 import torch
+from sklearn.metrics.pairwise import cosine_similarity
 
 users = params.users
 HUGGING_FACE_API = params.HUGGING_FACE_API
@@ -111,7 +112,7 @@ def store_document_embedding(company, type, filename, text):
             
             # Convert embeddings to list for database storage
             embeddings = normalized_embeddings.tolist()
-
+            
         # Store embeddings in the Supabase database
         for chunk, embedding in zip(chunks, embeddings):
             supabase.table("document_embeddings").insert({
@@ -130,48 +131,59 @@ def remove_document_embedding(company, type, filename):
         "filename": filename
     }).execute()
 
-def generate_embedding(text):
-    # Tokenize the input text
-    inputs = tokenizer(text, return_tensors='pt', padding=True, truncation=True, max_length=8192)
+def generate_embedding(text): 
+    # Tokenize the input text using the tokenizer's method (no manual splitting)
+    inputs = tokenizer(text, return_tensors='pt', padding=True, truncation=True, max_length=512)  # Adjust max_length if needed
     
     # Generate the embedding using the local model
     with torch.no_grad():
         outputs = model(**inputs)
-        
-    # Extract the embedding (first token's representation)
-    embedding = outputs.last_hidden_state[:, 0]
     
-    # Normalize the embedding
+    # Extract the embedding of the first token (CLS token in BERT)
+    embedding = outputs.last_hidden_state[:, 0, :]
+    
+    # Normalize the embedding to unit length
     normalized_embedding = F.normalize(embedding, p=2, dim=1)
     
     # Convert to list (for storing or further processing)
-    return normalized_embedding.tolist()[0]
+    return normalized_embedding.squeeze().tolist()
 
 # Retrieve relevant document passages for an email
 def retrieve_relevant_context(company, type, email_text, word_limit=2000):
-    email_embedding = generate_embedding(email_text)
     
-    response = supabase.rpc("pgvector_search", {
-        "query_embedding": email_embedding,
-        "company": company,
-        "type": type,
-        "limit": 10
-    }).execute()
+    email_embedding = generate_embedding(str(email_text))
     
-    if response.data:
-        passages = sorted(response.data, key=lambda x: np.dot(email_embedding, x["embedding"]), reverse=True)
-        selected_texts = []
-        word_count = 0
-        
-        for passage in passages:
-            words = passage["text"].split()
-            if word_count + len(words) > word_limit:
-                break
-            selected_texts.append(passage["text"])
-            word_count += len(words)
-        
-        print(f"word count = {word_count}")
-        print(f"selected_texts = {selected_texts}")
+    # Fetch all document embeddings from Supabase for the given company and type
+    response = supabase.table("document_embeddings").select("id, company, type, filename, text, embedding").eq("company", company).eq("type", type).execute()
 
-        return "\n".join(selected_texts) if selected_texts else None
+    if response.data:
+        # Calculate cosine similarity between the email embedding and document embeddings
+        embeddings = np.array([np.array(eval(doc["embedding"])) for doc in response.data])
+        email_embedding = np.array(email_embedding).reshape(1, -1)
+        similarities = cosine_similarity(email_embedding, embeddings)
+        
+        # Get indices of the top N most similar documents (e.g., top 3)
+        top_n = 15  # You can adjust this based on your needs
+        top_indices = np.argsort(similarities[0])[-top_n:][::-1]
+             
+        word_limit = 2000
+        words = []
+        current_word_count = 0
+
+        for idx in top_indices:
+            doc = response.data[idx]  # Document data from your response
+            doc_text = doc["text"]
+            
+            # Split the text into words and add to the words list until the word limit is reached
+            doc_words = doc_text.split()
+            remaining_space = word_limit - current_word_count
+            if remaining_space > 0:
+                words_to_add = doc_words[:remaining_space]
+                words.extend(words_to_add)
+                current_word_count += len(words_to_add)
+            else:
+                break
+
+        # Return the words as a sequence of strings
+        return ' '.join(words)
     return None

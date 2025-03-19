@@ -153,8 +153,10 @@ else:
 
         # existing_template = get_company_documents(company, "quote_template", True)
         cols_for_gen = st.columns([1, 3])
+        response_text = ""
         with cols_for_gen[0]:
             if st.button("Generate Response"):
+                
                 if not st.session_state["generating_email"]:
                     message.empty()
                     st.session_state["generating_email"] = True
@@ -167,13 +169,12 @@ else:
                             template_text = extract_pdf_text(quote_template[0])
                             st.info("Generating a quote...")
                             response_text = generate_response(email_text, product_catalog_text)
-                            st.text(response_text)
                             pdf_file = generate_quote(template_text, email_text, product_catalog_text)
                             st.download_button(label="Download Quote as PDF", data=open(pdf_file, "rb"), file_name="quote.pdf", mime="application/pdf")
                             
                         else:
                             response_text = generate_response(email_text, product_catalog_text)
-                            st.text(response_text)
+                            
                     else:
                         st.error("Please paste an email to generate a response.")
                     st.session_state["generating_email"] = False
@@ -189,7 +190,9 @@ else:
             existing_template = get_company_documents(company, "quote_template", True)
             if len(existing_template)==0 and st.session_state.force_quote_gen:
                 st.info("For improved quote generation, upload a quote.")
-    
+
+        st.text(response_text)
+        
     with cols_main_page[2]:
         
         # Company Documents Upload

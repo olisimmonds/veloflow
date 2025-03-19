@@ -1,5 +1,4 @@
-handle lots of docs
-test local fix errors, then make work for cloud
+handle lots of docs - make work for cloud
     \_Add openai key - count token length, approved llama 3.3 but need pro account 9$ per month, if not get abdi to pay for gpt 4o mini
         \_pdf generation
         |_Add context box where users can say stuff like 'give this guy a 20% discount'
