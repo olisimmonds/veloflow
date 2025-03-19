@@ -282,7 +282,7 @@ tokenizers==0.21.0
 toml
 tomli
 tomlkit
-torch==2.0.0
+torch
 tornado.67.1
 traitlets
 transformers==4.49.0
