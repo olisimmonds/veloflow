@@ -1,10 +1,10 @@
-Improve UI - cols and text boxes
 add to streamlit comunity cloud
 
 show abdi
 handle lots of docs (maybe for now)
 Add openai key
 pdf generation
+improve UI
 
 delete KMP_DUPLICATE_LIB_OK line and fix error
 shut down aws
