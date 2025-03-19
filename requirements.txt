@@ -218,8 +218,6 @@ python-slugify
 pytoolconfig
 pytz
 pyuca
-pywin32
-pywin32-ctypes
 pywinpty
 PyYAML
 pyzmq
