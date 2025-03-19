@@ -4,14 +4,9 @@ from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint, HuggingF
 
 from langchain_core.messages import HumanMessage, SystemMessage
 from functools import cache
+import params
 
-import os
-from dotenv import load_dotenv
-import re
-
-# load_dotenv()
-# HUGGING_FACE_API = os.getenv("HUGGING_FACE_API")
-HUGGING_FACE_API = st.secrets["HUGGING_FACE_API"]
+HUGGING_FACE_API = params.HUGGING_FACE_API
 
 # Function to extract text from the PDF product catalog
 # @cache # Commented out for now cus want to make sure we pull info from template and catalog
@@ -44,7 +39,9 @@ def generate_response(email, product_catalog_text):
         HumanMessage(content=f"Product Catalog:\n{product_catalog_text}\n\nCustomer Email:\n{email}"),
     ]
     # Load the model and chat agent
-    model = HuggingFaceEndpoint(repo_id="HuggingFaceH4/zephyr-7b-beta", task="text-generation", huggingfacehub_api_token=HUGGING_FACE_API)
+    # model_repo = "meta-llama/Llama-3.3-70B-Instruct"
+    model_repo = "HuggingFaceH4/zephyr-7b-beta"
+    model = HuggingFaceEndpoint(repo_id=model_repo, task="text-generation", huggingfacehub_api_token=HUGGING_FACE_API)
     chat_model = ChatHuggingFace(llm=model)
     
     # Get the model's response

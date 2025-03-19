@@ -5,15 +5,9 @@ from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint, HuggingF
 
 from langchain_core.messages import HumanMessage, SystemMessage
 # from langchain_openai import ChatOpenAI
-import os
-from dotenv import load_dotenv
-import re
+import params
 
-# load_dotenv()
-# HUGGING_FACE_API = os.getenv("HUGGING_FACE_API")
-HUGGING_FACE_API = st.secrets["HUGGING_FACE_API"]
-
-# OPEN_AI_API = os.getenv("OPEN_AI_API")
+HUGGING_FACE_API = params.HUGGING_FACE_API
 
 def determine_action(email):
 
@@ -41,7 +35,9 @@ def determine_action(email):
         ),
     ]
 
-    model = HuggingFaceEndpoint(repo_id="HuggingFaceH4/zephyr-7b-beta", task="text-generation", huggingfacehub_api_token=HUGGING_FACE_API)
+    # model_repo = "meta-llama/Llama-3.3-70B-Instruct"
+    model_repo = "HuggingFaceH4/zephyr-7b-beta"
+    model = HuggingFaceEndpoint(repo_id=model_repo, task="text-generation", huggingfacehub_api_token=HUGGING_FACE_API)
     chat_model = ChatHuggingFace(llm=model)
     ai_msg = chat_model.invoke(messages)
 
