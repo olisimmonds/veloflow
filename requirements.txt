@@ -218,7 +218,7 @@ python-slugify
 pytoolconfig
 pytz
 pyuca
-pywin32==304
+pywin32
 pywin32-ctypes
 pywinpty
 PyYAML
