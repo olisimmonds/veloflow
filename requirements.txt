@@ -152,7 +152,7 @@ nbclient
 nbconvert
 nbformat
 nest_asyncio
-netx==3.4.2
+netx
 notebook
 notebook_shim
 numpy==1.26.4
