@@ -1,5 +1,3 @@
-add to streamlit comunity cloud
-
 show abdi
 handle lots of docs (maybe for now)
 Add openai key

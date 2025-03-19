@@ -182,24 +182,30 @@ else:
         
         # Company Documents Upload
         st.title("Upload Company Documents")
-        uploaded_files = st.file_uploader("Upload PDFs", label_visibility="collapsed", type=["pdf"], accept_multiple_files=True)
 
-        if st.button("Upload Company Documents") and uploaded_files:
-            for file in uploaded_files:
-                upload_file_to_supabase(company, "company_docs", file)
-            st.rerun()
+        cols_right_side = st.columns([3,2])
+        with cols_right_side[0]:
+            uploaded_files = st.file_uploader("Upload PDFs", label_visibility="collapsed", type=["pdf"], accept_multiple_files=True)
+        with cols_right_side[1]:
+            st.write("")
+            if st.button("Upload Company Documents") and uploaded_files:
+                for file in uploaded_files:
+                    upload_file_to_supabase(company, "company_docs", file)
+                st.rerun()
 
         # List uploaded documents with options to delete
         company_doc_links = get_company_documents(company, "company_docs", True)
 
         # Check if the document exists
         if len(company_doc_links)>0:
+            
             selected_doc = st.selectbox("Select a document to delete", label_visibility = "collapsed", options=company_doc_links)
-
-            if selected_doc and st.session_state.confirm_del == False:
-                if st.button("Delete selceted company document"):
-                    st.session_state.confirm_del = True
-                    st.rerun()
+        
+            if selected_doc:
+                if st.session_state.confirm_del == False:
+                    if st.button("Delete selceted company document"):
+                        st.session_state.confirm_del = True
+                        st.rerun()
 
                 # Check if confirm_del is True
                 if st.session_state.confirm_del:
@@ -215,7 +221,7 @@ else:
                             st.session_state.confirm_del = False  # Reset the confirmation state
                             st.info(f"Document deletion of '{selected_doc}' cancelled.")
                             st.rerun()
-        
+            
         # Quote Template Upload (Limited to One)
         st.title("Upload Quote Template")
         existing_template = get_company_documents(company, "quote_template", True)
