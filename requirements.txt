@@ -310,5 +310,4 @@ zipp
 zstandard==0.23.0
 pytorch 
 torchvision 
-torchaudio 
 cudatoolkit
