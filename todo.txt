@@ -3,6 +3,7 @@ Get abdi to pay for gpt 4o mini
     |_Add context box where users can say stuff like 'give this guy a 20% discount'
         \_Show andy and abdis account manager
 
+Other types of docs, add copy button - needs java script coding
 delete KMP_DUPLICATE_LIB_OK line and fix error
 shut down aws
 shut down firestore google

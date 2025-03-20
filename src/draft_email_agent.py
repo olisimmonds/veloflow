@@ -8,35 +8,26 @@ import params
 
 HUGGING_FACE_API = params.HUGGING_FACE_API
 
-# Function to extract text from the PDF product catalog
-# @cache # Commented out for now cus want to make sure we pull info from template and catalog
-# def extract_pdf_text(pdf_path):
-#     with open(pdf_path, 'rb') as file:
-#         reader = PyPDF2.PdfReader(file)
-#         text = ""
-#         for page in reader.pages:
-#             text += page.extract_text()
-#     return text
-
 # Function to generate a response based on customer email and the product catalog
-def generate_response(email, product_catalog_text):
+def generate_response(email, product_catalog_text, user_context):
 
     # Define the system message for the agent (context)
     messages = [
         SystemMessage(content=(
             """
-            You are an assistant for a technical sales team. Your task is to read a customer's email and, using the provided product catalog, generate a detailed response.
+            You are an assistant for a technical sales team. Your task is to read a customer's email and, using the provided company context and user provided contex, generate a detailed response.
             You must:
             - Extract relevant products or services from the catalog to recommend or quote to the customer based on their inquiry.
             - Respond by summarizing the product or service, its features, and any associated costs. 
+            - Take into account any context provided by the user.
             If the email contains a request for a quote, provide the quote details. Otherwise, respond with product recommendations or explanations.
             
-            The product catalog is provided below.
-            You are also given a customer email. Use both the catalog and the email content to craft a response.
+            The company context and user provided context is given in the human message.
+            You are also given a customer email. Use all provided information to produce a response.
             Make sure your response is professional and addresses the customer's needs.
             """
         )),
-        HumanMessage(content=f"Product Catalog:\n{product_catalog_text}\n\nCustomer Email:\n{email}"),
+        HumanMessage(content=f"Company context:\n{product_catalog_text}\n\nUser provided contex:\n{user_context}\n\nCustomer Email:\n{email}"),
     ]
     # Load the model and chat agent
     # model_repo = "meta-llama/Llama-3.3-70B-Instruct"

@@ -24,7 +24,7 @@ def generate_pdf(text):
     pdf.output(pdf_output)
     return pdf_output
 
-def generate_quote(template_text, client_email, product_catalog_text):
+def generate_quote(template_text, client_email, product_catalog_text, user_context):
 
     # Define the system message for the agent (context)
     messages = [
@@ -36,6 +36,7 @@ def generate_quote(template_text, client_email, product_catalog_text):
             Instructions:
             - Use the email provided below to understand the customer's needs, including any specific product requests or pricing inquiries.
             - Use the company context provided to identify relevant products or services that match the customer's needs.
+            - If context has been provided by the user, include this as well.
             - The quote should follow the provided template exactly, filling in the blanks, or replacing the feilds which need updating with appropriate details:
             - Do not add any extra content beyond what is specified in the template.
 
@@ -44,6 +45,9 @@ def generate_quote(template_text, client_email, product_catalog_text):
 
             Here is the customer's email:
             {client_email}
+
+            Here is some contex the user has given you:
+            {user_context}
 
             Generate the quote based on this information, following the template and only filling in the blanks as directed.
 

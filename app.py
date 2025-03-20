@@ -43,7 +43,25 @@ if 'confirm_del_of_quote' not in st.session_state:
 if "force_quote_gen" not in st.session_state:
     st.session_state.force_quote_gen = False
 
+if "email_in_mem" not in st.session_state:
+    st.session_state.email_in_mem = False
+
+if "response_text" not in st.session_state:
+    st.session_state.response_text = ""
+
+if "context_from_user" not in st.session_state:
+    st.session_state.context_from_user = ""
+
 message = st.empty()
+
+def diveder(pix):
+    with st.container():
+        st.markdown(
+            """
+            <hr style="border: {pix}px solid #000; width: 100%; margin: 10px 0;">
+            """,
+            unsafe_allow_html=True,
+        )    
 
 # Your existing Streamlit code for login logic
 if not st.session_state.get("logged_in", False):
@@ -149,11 +167,12 @@ else:
         st.title("Veloflow - AI Sales Assistant")
         st.subheader("Generate AI-Powered Responses & Quotes")
 
-        email_text = st.text_area("Paste the customer's email below:")
+        email_text = st.text_area(
+            "Paste the customer's email below:",
+            height=150
+            )
 
-        # existing_template = get_company_documents(company, "quote_template", True)
         cols_for_gen = st.columns([1, 3])
-        response_text = ""
         with cols_for_gen[0]:
             if st.button("Generate Response"):
                 
@@ -167,14 +186,13 @@ else:
 
                         if action == 'b2' and len(quote_template)>0 or st.session_state.force_quote_gen:
                             template_text = extract_pdf_text(quote_template[0])
-                            st.info("Generating a quote...")
-                            response_text = generate_response(email_text, product_catalog_text)
-                            pdf_file = generate_quote(template_text, email_text, product_catalog_text)
+                            st.session_state.response_text = generate_response(email_text, product_catalog_text, st.session_state.context_from_user)
+                            pdf_file = generate_quote(template_text, email_text, product_catalog_text, st.session_state.context_from_user)
                             st.download_button(label="Download Quote as PDF", data=open(pdf_file, "rb"), file_name="quote.pdf", mime="application/pdf")
-                            
+                            st.session_state.email_in_mem = True
                         else:
-                            response_text = generate_response(email_text, product_catalog_text)
-                            
+                            st.session_state.response_text = generate_response(email_text, product_catalog_text, st.session_state.context_from_user)
+                            st.session_state.email_in_mem = True
                     else:
                         st.error("Please paste an email to generate a response.")
                     st.session_state["generating_email"] = False
@@ -191,12 +209,43 @@ else:
             if len(existing_template)==0 and st.session_state.force_quote_gen:
                 st.info("For improved quote generation, upload a quote.")
 
-        st.text(response_text)
+        diveder(1)
         
+        if st.session_state.email_in_mem:
+            st.markdown(
+                f"""
+                <div id="response-box" style="
+                    background-color: white; 
+                    padding: 10px; 
+                    border-radius: 5px; 
+                    box-shadow: 2px 2px 10px rgba(0,0,0,0.1); 
+                    border: 1px solid #ddd;
+                    width: 100%;
+                    word-wrap: break-word;">
+                    {st.session_state.response_text}
+                </div>
+                """, 
+                unsafe_allow_html=True
+            )
+        
+
     with cols_main_page[2]:
         
-        # Company Documents Upload
-        st.title("Company Documents and Product Catalogues")
+        st.subheader("Optional: Additional context for email")
+        st.session_state.context_from_user = st.text_area(
+            "Context",
+            label_visibility="collapsed",
+            placeholder=(
+                "Would you like to offer a discount? "
+                "What tone should the email have? "
+                "Are there any key details that must be included?"
+            ),
+            value=st.session_state.context_from_user,  # Preserve input
+            height=150,  # Adjust height as needed
+        )
+
+        diveder(1)
+        st.subheader("Company Documents and Product Catalogues")
 
         cols_right_side = st.columns([3,2])
         with cols_right_side[0]:
@@ -238,9 +287,11 @@ else:
                             st.session_state.confirm_del = False  # Reset the confirmation state
                             st.info(f"Document deletion of '{selected_doc}' cancelled.")
                             st.rerun()
-            
+        
+        diveder(1)
+
         # Quote Template Upload (Limited to One)
-        st.title("Upload Quote Template / Previous Quote")
+        st.subheader("Upload Quote Template / Previous Quote")
         existing_template = get_company_documents(company, "quote_template", True)
 
         if len(existing_template)>0:
