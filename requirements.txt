@@ -1,3 +1,7 @@
+easyocr
+python-docx 
+ebooklib 
+openpyxl
 aiohappyeyeballs
 aiohttp
 aiosignal

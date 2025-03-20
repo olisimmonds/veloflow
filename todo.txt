@@ -1,6 +1,8 @@
-Get abdi to pay for gpt 4o mini
-    \_pdf generation, Other types of docs - use AI to interpret use AI to generate in same format, option to change
+pdf generation, Other types of docs, need new func for quote as need to maintain format - use AI to interpret use AI to generate in same format, option to change (give text box for making suggested changes)
+    \_ Make demo vid
         \_Show andy and abdis account manager
+
+Get abdi to apply for funding
 
 Add copy button - needs java script coding
 delete KMP_DUPLICATE_LIB_OK line and fix error

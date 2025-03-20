@@ -13,6 +13,7 @@ import torch.nn.functional as F
 from transformers import AutoModel, AutoTokenizer
 import torch
 from sklearn.metrics.pairwise import cosine_similarity
+from src.extract_text import extract_text
 
 users = params.users
 HUGGING_FACE_API = params.HUGGING_FACE_API
@@ -51,16 +52,16 @@ def authenticate_user(email):
 def extract_filenames(directories: List[str]) -> List[str]:
     return [path.split('/')[-1] for path in directories]
 
-def extract_pdf_text(file_source):
-    if isinstance(file_source, str):  # Check if it's a URL
-        response = requests.get(file_source)
-        if response.status_code == 200:
-            file_source = BytesIO(response.content)  # Convert to a file-like object
-        else:
-            raise ValueError(f"Failed to fetch PDF from {file_source}, Status Code: {response.status_code}")
+# def extract_pdf_text(file_source):
+#     if isinstance(file_source, str):  # Check if it's a URL
+#         response = requests.get(file_source)
+#         if response.status_code == 200:
+#             file_source = BytesIO(response.content)  # Convert to a file-like object
+#         else:
+#             raise ValueError(f"Failed to fetch PDF from {file_source}, Status Code: {response.status_code}")
 
-    pdf_reader = PdfReader(file_source)
-    return "\n".join([page.extract_text() for page in pdf_reader.pages if page.extract_text()])
+#     pdf_reader = PdfReader(file_source)
+#     return "\n".join([page.extract_text() for page in pdf_reader.pages if page.extract_text()])
 
 
 # Function to upload files to Supabase Storage and embedings to Supabase Tables
@@ -82,7 +83,7 @@ def upload_file_to_supabase(company, type, uploaded_file):
         st.success(f"File '{uploaded_file.name}' uploaded successfully!")
         if type == "company_docs":
             file_link = supabase.storage.from_(BUCKET_NAME).get_public_url(file_path)
-            text = extract_pdf_text(file_link)
+            text = extract_text(file_link)
             store_document_embedding(company, type, uploaded_file.name, text)
     else:
         st.error("Failed to upload file.")

@@ -24,7 +24,8 @@ from src.draft_email_agent import generate_response
 from src.make_quote import generate_quote
 from PyPDF2 import PdfReader
 import time
-from src.app_config_functions import get_company_documents, upload_file_to_supabase, delete_company_doc, authenticate_user, extract_pdf_text, extract_filenames, retrieve_relevant_context
+from src.app_config_functions import get_company_documents, upload_file_to_supabase, delete_company_doc, authenticate_user, extract_filenames, retrieve_relevant_context
+from src.extract_text import extract_text
 from PIL import Image
 from pathlib import Path
 
@@ -186,7 +187,7 @@ else:
                         quote_template = get_company_documents(company, "quote_template")
 
                         if action == 'b2' and len(quote_template)>0 or st.session_state.force_quote_gen:
-                            template_text = extract_pdf_text(quote_template[0])
+                            template_text = extract_text(quote_template[0])
                             st.session_state.response_text = generate_response(email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
                             pdf_file = generate_quote(template_text, email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
                             st.download_button(label="Download Quote as PDF", data=open(pdf_file, "rb"), file_name="quote.pdf", mime="application/pdf")
@@ -250,7 +251,13 @@ else:
 
         cols_right_side = st.columns([3,2])
         with cols_right_side[0]:
-            uploaded_files = st.file_uploader("Upload PDFs", label_visibility="collapsed", type=["pdf"], accept_multiple_files=True)
+            uploaded_files = st.file_uploader(
+                "Upload Files", 
+                label_visibility="collapsed", 
+                type=["pdf", "docx", "txt", "csv", "jpg", "png", "html", "md", "xls", "xlsx"], 
+                accept_multiple_files=True
+            )
+
         with cols_right_side[1]:
             st.write("")
             if st.button("Upload Company Documents") and uploaded_files:
