@@ -16,7 +16,7 @@ def get_img_as_base64(file):
         data = f.read()
     return base64.b64encode(data).decode()
 
-main_back = get_img_as_base64("static/bg7.jpg")
+main_back = get_img_as_base64("static/bg8.jpg")
 login_back = get_img_as_base64("static/background5.jpg")
 
 from src.master_agent import determine_action, get_action_from_response
@@ -164,6 +164,7 @@ else:
     company = st.session_state["company"]
     cols_main_page = st.columns([10, 1, 8])
     with cols_main_page[0]:
+        
         st.title("Veloflow - AI Sales Assistant")
         st.subheader("Generate AI-Powered Responses & Quotes")
 
@@ -209,28 +210,28 @@ else:
             if len(existing_template)==0 and st.session_state.force_quote_gen:
                 st.info("For improved quote generation, upload a quote.")
 
-        diveder(1)
-        
-        if st.session_state.email_in_mem:
-            st.markdown(
-                f"""
-                <div id="response-box" style="
-                    background-color: white; 
-                    padding: 10px; 
-                    border-radius: 5px; 
-                    box-shadow: 2px 2px 10px rgba(0,0,0,0.1); 
-                    border: 1px solid #ddd;
-                    width: 100%;
-                    word-wrap: break-word;">
-                    {st.session_state.response_text}
-                </div>
-                """, 
-                unsafe_allow_html=True
-            )
+    diveder(1)
+    
+    if st.session_state.email_in_mem:
+        st.markdown(
+            f"""
+            <div id="response-box" style="
+                background-color: white; 
+                padding: 10px; 
+                border-radius: 5px; 
+                box-shadow: 2px 2px 10px rgba(0,0,0,0.1); 
+                border: 1px solid #ddd;
+                width: 100%;
+                word-wrap: break-word;">
+                {st.session_state.response_text}
+            </div>
+            """, 
+            unsafe_allow_html=True
+        )
         
 
     with cols_main_page[2]:
-        
+        st.write("")
         st.subheader("Optional: Additional context for email")
         st.session_state.context_from_user = st.text_area(
             "Context",

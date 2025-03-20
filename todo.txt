@@ -1,6 +1,5 @@
 Get abdi to pay for gpt 4o mini
     \_pdf generation
-    |_Add context box where users can say stuff like 'give this guy a 20% discount'
         \_Show andy and abdis account manager
 
 Other types of docs, add copy button - needs java script coding
@@ -11,7 +10,7 @@ upgrade supabase?
 Send out
 improve security
 improve auth - move to supabase auth
-Implement payment with strip
+Implement payment with strip - anyone can sign up for 10£ a month
 LLM to search internet
 Improve UI - move away from streamlit?
 
