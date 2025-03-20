@@ -210,24 +210,24 @@ else:
             if len(existing_template)==0 and st.session_state.force_quote_gen:
                 st.info("For improved quote generation, upload a quote.")
 
-    diveder(1)
-    
-    if st.session_state.email_in_mem:
-        st.markdown(
-            f"""
-            <div id="response-box" style="
-                background-color: white; 
-                padding: 10px; 
-                border-radius: 5px; 
-                box-shadow: 2px 2px 10px rgba(0,0,0,0.1); 
-                border: 1px solid #ddd;
-                width: 100%;
-                word-wrap: break-word;">
-                {st.session_state.response_text}
-            </div>
-            """, 
-            unsafe_allow_html=True
-        )
+        diveder(1)
+        
+        if st.session_state.email_in_mem:
+            st.markdown(
+                f"""
+                <div id="response-box" style="
+                    background-color: white; 
+                    padding: 10px; 
+                    border-radius: 5px; 
+                    box-shadow: 2px 2px 10px rgba(0,0,0,0.1); 
+                    border: 1px solid #ddd;
+                    width: 100%;
+                    word-wrap: break-word;">
+                    {st.session_state.response_text}
+                </div>
+                """, 
+                unsafe_allow_html=True
+            )
         
 
     with cols_main_page[2]:
