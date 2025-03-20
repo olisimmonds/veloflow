@@ -27,6 +27,7 @@ model = AutoModel.from_pretrained(local_model_path, trust_remote_code=True)
 
 
 def authenticate_user(email):
+    email = email.lower()
     if email in users:
         return email, users[email]
     else: return False, False

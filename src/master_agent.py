@@ -46,6 +46,7 @@ def determine_action(email):
 
 def get_action_from_response(model_output):
     # Regular expression to match the action labels
+    import re
     match = re.search(r'\b(a1|b2)\b', model_output.lower())  #|c3
     
     if match:
