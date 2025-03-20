@@ -22,13 +22,25 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 BUCKET_NAME = "veloflow-company-docs"
 
 model_id = "sentence-transformers/all-MiniLM-L6-v2"
-api_url = f"https://api-inference.huggingface.co/pipeline/feature-extraction/{model_id}"
-headers = {"Authorization": f"Bearer {HUGGING_FACE_API}"}
+# api_url = f"https://api-inference.huggingface.co/pipeline/feature-extraction/{model_id}"
+# headers = {"Authorization": f"Bearer {HUGGING_FACE_API}"}
+
+from huggingface_hub import InferenceClient
+
+# Initialize the Hugging Face Inference Client
+client = InferenceClient(
+    model=model_id,  # Replace with your actual model ID
+    token=HUGGING_FACE_API  # Replace with your actual Hugging Face token
+)
 
 def embed(texts):
-    response = requests.post(api_url, headers=headers, json={"inputs": texts, "options":{"wait_for_model":True}})
-    print(f"emedded email = {response}")
-    return response.json()
+    return client.feature_extraction(texts)
+
+
+# def embed(texts):
+#     response = requests.post(api_url, headers=headers, json={"inputs": texts, "options":{"wait_for_model":True}})
+#     print(f"emedded email = {response}")
+#     return response.json()
 
 def authenticate_user(email):
     email = email.lower()
