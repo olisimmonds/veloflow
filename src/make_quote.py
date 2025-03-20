@@ -24,7 +24,7 @@ def generate_pdf(text):
     pdf.output(pdf_output)
     return pdf_output
 
-def generate_quote(template_text, client_email, product_catalog_text, user_context):
+def generate_quote(template_text, client_email, product_catalog_text, user_context, user_email):
 
     # Define the system message for the agent (context)
     messages = [
@@ -51,13 +51,13 @@ def generate_quote(template_text, client_email, product_catalog_text, user_conte
 
             Generate the quote based on this information, following the template and only filling in the blanks as directed.
 
+            The user your working for has the email {user_email}.
             """
         )),
         HumanMessage(content=f"Here is the template: {template_text}"),
     ]
     
     # Load the model and chat agent
-    # model_repo = "meta-llama/Llama-3.3-70B-Instruct"
     model_repo = "HuggingFaceH4/zephyr-7b-beta"
     model = HuggingFaceEndpoint(repo_id=model_repo, task="text-generation", huggingfacehub_api_token=HUGGING_FACE_API)
     chat_model = ChatHuggingFace(llm=model)

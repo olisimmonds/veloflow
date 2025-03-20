@@ -17,6 +17,7 @@ if running_on_cloud():
     SUPABASE_URL = st.secrets["supabase_url"]
     SUPABASE_KEY = st.secrets["supabase_api_key"]
     HUGGING_FACE_API = st.secrets["HUGGING_FACE_API"]
+    OPENAI_KEY = st.secrets["OPENAI_KEY"]
     
 else:
     # Local
@@ -24,4 +25,5 @@ else:
     SUPABASE_URL = os.getenv("supabase_url")
     SUPABASE_KEY = os.getenv("supabase_api_key")
     HUGGING_FACE_API = os.getenv("HUGGING_FACE_API")
+    OPENAI_KEY = os.getenv("OPENAI_KEY")
 

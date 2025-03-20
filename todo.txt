@@ -1,8 +1,8 @@
 Get abdi to pay for gpt 4o mini
-    \_pdf generation
+    \_pdf generation, Other types of docs - use AI to interpret use AI to generate in same format, option to change
         \_Show andy and abdis account manager
 
-Other types of docs, add copy button - needs java script coding
+Add copy button - needs java script coding
 delete KMP_DUPLICATE_LIB_OK line and fix error
 shut down aws
 shut down firestore google

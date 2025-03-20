@@ -187,12 +187,12 @@ else:
 
                         if action == 'b2' and len(quote_template)>0 or st.session_state.force_quote_gen:
                             template_text = extract_pdf_text(quote_template[0])
-                            st.session_state.response_text = generate_response(email_text, product_catalog_text, st.session_state.context_from_user)
-                            pdf_file = generate_quote(template_text, email_text, product_catalog_text, st.session_state.context_from_user)
+                            st.session_state.response_text = generate_response(email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
+                            pdf_file = generate_quote(template_text, email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
                             st.download_button(label="Download Quote as PDF", data=open(pdf_file, "rb"), file_name="quote.pdf", mime="application/pdf")
                             st.session_state.email_in_mem = True
                         else:
-                            st.session_state.response_text = generate_response(email_text, product_catalog_text, st.session_state.context_from_user)
+                            st.session_state.response_text = generate_response(email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
                             st.session_state.email_in_mem = True
                     else:
                         st.error("Please paste an email to generate a response.")
