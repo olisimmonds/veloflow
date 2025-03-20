@@ -308,4 +308,3 @@ yapf
 yarl
 zipp
 zstandard==0.23.0
-pytorch 
