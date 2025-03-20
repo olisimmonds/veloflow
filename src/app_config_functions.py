@@ -21,10 +21,13 @@ SUPABASE_KEY = params.SUPABASE_KEY
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 BUCKET_NAME = "veloflow-company-docs"
 
-local_model_path = './models/local_model'  # This is the directory where you saved the model
-tokenizer = AutoTokenizer.from_pretrained(local_model_path)
-model = AutoModel.from_pretrained(local_model_path, trust_remote_code=True)
+model_id = "sentence-transformers/all-MiniLM-L6-v2"
+api_url = f"https://api-inference.huggingface.co/pipeline/feature-extraction/{model_id}"
+headers = {"Authorization": f"Bearer {HUGGING_FACE_API}"}
 
+def embed(texts):
+    response = requests.post(api_url, headers=headers, json={"inputs": texts, "options":{"wait_for_model":True}})
+    return response.json()
 
 def authenticate_user(email):
     email = email.lower()
@@ -99,20 +102,7 @@ def store_document_embedding(company, type, filename, text):
     with st.spinner("Embedding document..."):
         chunks = text.split(". ")  # Simple sentence-based chunking
 
-        embeddings = []
-        with torch.no_grad():  # Disable gradients for inference
-            # Process all chunks at once by tokenizing in batch
-            inputs = tokenizer(chunks, padding=True, truncation=True, return_tensors='pt', max_length=8192)
-            
-            # Generate embeddings by passing inputs through the model
-            outputs = model(**inputs)
-            
-            # Extract the first token embeddings (CLS token) and normalize them
-            chunk_embeddings = outputs.last_hidden_state[:, 0]
-            normalized_embeddings = F.normalize(chunk_embeddings, p=2, dim=1)
-            
-            # Convert embeddings to list for database storage
-            embeddings = normalized_embeddings.tolist()
+        embeddings = embed(chunks)
             
         # Store embeddings in the Supabase database
         for chunk, embedding in zip(chunks, embeddings):
@@ -132,27 +122,10 @@ def remove_document_embedding(company, type, filename):
         "filename": filename
     }).execute()
 
-def generate_embedding(text): 
-    # Tokenize the input text using the tokenizer's method (no manual splitting)
-    inputs = tokenizer(text, return_tensors='pt', padding=True, truncation=True, max_length=512)  # Adjust max_length if needed
-    
-    # Generate the embedding using the local model
-    with torch.no_grad():
-        outputs = model(**inputs)
-    
-    # Extract the embedding of the first token (CLS token in BERT)
-    embedding = outputs.last_hidden_state[:, 0, :]
-    
-    # Normalize the embedding to unit length
-    normalized_embedding = F.normalize(embedding, p=2, dim=1)
-    
-    # Convert to list (for storing or further processing)
-    return normalized_embedding.squeeze().tolist()
-
 # Retrieve relevant document passages for an email
 def retrieve_relevant_context(company, type, email_text, word_limit=2000):
     
-    email_embedding = generate_embedding(str(email_text))
+    email_embedding = embed(email_text)
     
     # Fetch all document embeddings from Supabase for the given company and type
     response = supabase.table("document_embeddings").select("id, company, type, filename, text, embedding").eq("company", company).eq("type", type).execute()
