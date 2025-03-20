@@ -325,7 +325,12 @@ else:
                         st.rerun()
 
         else:
-            uploaded_template = st.file_uploader("Upload a Quote Template (PDF)", label_visibility = "collapsed", type=["pdf"], accept_multiple_files=False)
+            uploaded_template = uploaded_files = st.file_uploader(
+                "Upload a Quote Template", 
+                label_visibility="collapsed", 
+                type=["pdf", "docx", "txt", "csv", "jpg", "png", "html", "md", "xls", "xlsx"], 
+                accept_multiple_files=False
+            )
             if uploaded_template and st.button("Upload Quote Template"):
                 upload_file_to_supabase(company, "quote_template", uploaded_template)
                 st.rerun()
