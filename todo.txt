@@ -1,8 +1,7 @@
-make work for cloud
-    \_Add openai key - count token length, approved llama 3.3 but need pro account 9$ per month, if not get abdi to pay for gpt 4o mini
-        \_pdf generation
-        |_Add context box where users can say stuff like 'give this guy a 20% discount'
-            \_Show andy and abdis account manager
+Get abdi to pay for gpt 4o mini
+    \_pdf generation
+    |_Add context box where users can say stuff like 'give this guy a 20% discount'
+        \_Show andy and abdis account manager
 
 delete KMP_DUPLICATE_LIB_OK line and fix error
 shut down aws

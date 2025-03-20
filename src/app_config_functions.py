@@ -27,6 +27,7 @@ headers = {"Authorization": f"Bearer {HUGGING_FACE_API}"}
 
 def embed(texts):
     response = requests.post(api_url, headers=headers, json={"inputs": texts, "options":{"wait_for_model":True}})
+    print(f"emedded email = {response}")
     return response.json()
 
 def authenticate_user(email):
