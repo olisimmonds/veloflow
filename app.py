@@ -28,6 +28,7 @@ from src.ui.app_config_functions import (
     diveder
 )
 from src.ui.pages.login_page import login_page
+from src.ui.pages.generation_tab import generation_tab
 
 if "logged_in" not in st.session_state:
     st.session_state["logged_in"] = False
@@ -56,11 +57,7 @@ if "response_text" not in st.session_state:
 if "context_from_user" not in st.session_state:
     st.session_state.context_from_user = ""
 
-email_warining_message = st.empty()
-quote_warining_message = st.empty()
-
 main_back = get_img_as_base64("static/bg8.jpg")
- 
 
 # Your existing Streamlit code for login logic
 if not st.session_state.get("logged_in", False):
@@ -68,7 +65,7 @@ if not st.session_state.get("logged_in", False):
     
 # If logged in, show the main app
 else:
-
+    # Main page config set up
     page_bg_img = f"""
     <style>
     [data-testid="stAppViewContainer"] {{
@@ -88,96 +85,9 @@ else:
 
     company = st.session_state["company"]
     cols_main_page = st.columns([10, 1, 8])
+
     with cols_main_page[0]:
-        
-        st.title("Veloflow - AI Sales Assistant")
-        st.subheader("Generate AI-Powered Responses & Quotes")
-
-        email_text = st.text_area(
-            "Paste the customer's email below:",
-            height=150
-            )
-
-        cols_for_gen = st.columns([1, 3])
-        with cols_for_gen[0]:
-            if st.button("Generate Email"):
-                with st.spinner("Generating Email Response"):
-                    if not st.session_state["generating_email"]:
-                        email_warining_message.empty()
-                        st.session_state["generating_email"] = True
-                        if email_text:
-                            product_catalog_text = retrieve_relevant_context(company, "company_docs", email_text, word_limit=2000)
-                            quote_template = get_company_documents(company, "quote_template")
-
-                            st.session_state.response_text = generate_response(email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
-                            st.session_state.email_in_mem = True
-
-                        else:
-                            st.error("Please paste an email to generate a response.")
-                        st.session_state["generating_email"] = False
-                    else: 
-                        email_warining_message.markdown("<h3 style='color:red;'>Please only press 'Generate Response' once. \nWait a few seconds and then the button will become available again.</h3>", unsafe_allow_html=True)
-                        time.sleep(2)
-                        email_warining_message.empty()
-                        st.session_state["generating_email"] = False
-                        email_warining_message.markdown("<h3 style='color:red;'>Try again now</h3>", unsafe_allow_html=True)
-        
-        # with cols_for_gen[1]:
-        #     if st.button("Generate Quote"):
-        #         with st.spinner("Generating Quote..."):
-        #             if not st.session_state["generating_quote"]:
-        #                 quote_warining_message.empty()
-        #                 st.session_state["generating_quote"] = True
-        #                 if email_text:
-        #                     product_catalog_text = retrieve_relevant_context(company, "company_docs", email_text, word_limit=2000)
-        #                     quote_template = get_company_documents(company, "quote_template")
-        #                     if len(quote_template)==0:
-        #                         quote_template = get_company_documents("default", "quote_template")
-                            
-        #                     template_text = extract_text(quote_template[0])
-        #                     # pdf_file, original_file_template = generate_quote(quote_template[0], template_text, email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
-        #                     pdf_file = generate_quote(quote_template[0], template_text, email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
-        #                     # st.download_button(label="Download Quote as PDF", data=open(pdf_file, "rb"), file_name="quote.pdf", mime="application/pdf")
-        #                     st.download_button(label="Download Quote as PDF", 
-        #                         data=pdf_file.getvalue(),  # Convert BytesIO to bytes
-        #                         file_name="quote.docx", 
-        #                         mime="application/docx")
-        #                     # file_type = quote_template[0].split('.')[-1]
-        #                     # st.download_button(
-        #                     #     label=f"Quote as {file_type.upper()}",
-        #                     #     data=original_file_template.getvalue() if isinstance(original_file_template, io.BytesIO) else open(original_file_template, "rb"),
-        #                     #     file_name=f"quote.{file_type}",
-        #                     #     mime=f"application/{file_type if file_type != 'txt' else 'plain'}"
-        #                     # )
-                        
-        #                 else:
-        #                     st.error("Please paste an email to generate a response.")
-        #                 st.session_state["generating_quote"] = False
-        #             else: 
-        #                 quote_warining_message.markdown("<h3 style='color:red;'>Please only press 'Generate Quote' once. \nWait a few seconds and then the button will become available again.</h3>", unsafe_allow_html=True)
-        #                 time.sleep(2)
-        #                 quote_warining_message.empty()
-        #                 st.session_state["generating_quote"] = False
-        #                 quote_warining_message.markdown("<h3 style='color:red;'>Try again now</h3>", unsafe_allow_html=True)
-
-        diveder(1)
-        
-        if st.session_state.email_in_mem:
-            st.markdown(
-                f"""
-                <div id="response-box" style="
-                    background-color: white; 
-                    padding: 10px; 
-                    border-radius: 5px; 
-                    box-shadow: 2px 2px 10px rgba(0,0,0,0.1); 
-                    border: 1px solid #ddd;
-                    width: 100%;
-                    word-wrap: break-word;">
-                    {st.session_state.response_text}
-                </div>
-                """, 
-                unsafe_allow_html=True
-            )
+        generation_tab(company)
         
 
     with cols_main_page[2]:
