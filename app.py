@@ -62,11 +62,11 @@ else:
     st.markdown(page_bg_img, unsafe_allow_html=True)
 
     company = st.session_state["company"]
+    
     cols_main_page = st.columns([10, 1, 8])
 
     with cols_main_page[0]:
         generation_tab(company)
-        
 
     with cols_main_page[2]:
         context_tab(company)

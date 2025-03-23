@@ -9,8 +9,6 @@ from openai import OpenAI
 HUGGING_FACE_API = params.HUGGING_FACE_API
 OPENAI_KEY = params.OPENAI_KEY
 
-# Function to generate a response based on customer email and the product catalog
-
 #OpenAI
 
 client = OpenAI(

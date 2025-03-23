@@ -1,11 +1,6 @@
 import streamlit as st
 from src.ui.app_config_functions import (
-    get_company_documents, 
-    upload_file_to_supabase, 
-    delete_company_doc, 
     authenticate_user, 
-    extract_filenames, 
-    retrieve_relevant_context,
     get_img_as_base64
 )
 

@@ -1,17 +1,10 @@
 import streamlit as st
 
-from src.ai.master_agent import determine_action, get_action_from_response
-from src.ai.draft_email_agent import generate_response
-from src.ai.make_quote import generate_quote
-from src.ai.extract_text import extract_text
 from src.ui.app_config_functions import (
     get_company_documents, 
     upload_file_to_supabase, 
     delete_company_doc, 
-    authenticate_user, 
-    extract_filenames, 
-    retrieve_relevant_context,
-    get_img_as_base64,
+    extract_filenames,
     diveder
 )
 
@@ -83,7 +76,7 @@ def context_tab(company_name: str):
     
     diveder(1)
 
-    ## Quote Template Upload (Limited to One)
+    # # Quote Template Upload (Limited to One)
     # st.subheader("Upload Quote Template / Previous Quote")
     # existing_template = get_company_documents(company_name, "quote_template", True)
 

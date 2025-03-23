@@ -1,3 +1,7 @@
+### Legacy functonality at the moment. Makes more sence to allow user to determine action than guess with AI.
+
+
+
 # Determin action
 import streamlit as st
 from langchain.prompts import PromptTemplate
