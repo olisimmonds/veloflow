@@ -14,6 +14,7 @@ from transformers import AutoModel, AutoTokenizer
 import torch
 from sklearn.metrics.pairwise import cosine_similarity
 from src.extract_text import extract_text
+from storage3.utils import StorageException
 
 users = params.users
 HUGGING_FACE_API = params.HUGGING_FACE_API
@@ -75,8 +76,12 @@ def upload_file_to_supabase(company, type, uploaded_file):
         temp_filename = temp_file.name
 
     with open(temp_filename, "rb") as f:
-        res = supabase.storage.from_(BUCKET_NAME).upload(file_path, f, {"content-type": "application/pdf"})
-
+        try:
+            res = supabase.storage.from_(BUCKET_NAME).upload(file_path, f, {"content-type": "application/pdf"})
+        except StorageException as e:
+            st.info("Resource already exists in storage")
+            return None
+        
     os.remove(temp_filename)
 
     if res:
@@ -125,7 +130,7 @@ def store_document_embedding(company, type, filename, text):
                 "type": type,
                 "filename": filename,
                 "text": chunk,
-                "embedding": embedding
+                "embedding": embedding.tolist()
             }).execute()
 
 # Remove embeddings when deleting a document

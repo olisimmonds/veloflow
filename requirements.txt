@@ -1,3 +1,6 @@
+fitz
+frontend
+pdf2docx
 easyocr
 python-docx 
 ebooklib 
@@ -159,7 +162,7 @@ nest_asyncio
 netx
 notebook
 notebook_shim
-numpy==1.26.4
+numpy
 numpydoc
 openai==1.66.2
 orjson==3.10.15

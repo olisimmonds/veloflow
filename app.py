@@ -24,6 +24,7 @@ from src.draft_email_agent import generate_response
 from src.make_quote import generate_quote
 from PyPDF2 import PdfReader
 import time
+import io
 from src.app_config_functions import get_company_documents, upload_file_to_supabase, delete_company_doc, authenticate_user, extract_filenames, retrieve_relevant_context
 from src.extract_text import extract_text
 from PIL import Image
@@ -34,6 +35,9 @@ if "logged_in" not in st.session_state:
 
 if "generating_email" not in st.session_state:
     st.session_state["generating_email"] = False
+
+if "generating_quote" not in st.session_state:
+    st.session_state["generating_quote"] = False
 
 if 'confirm_del' not in st.session_state:
     st.session_state.confirm_del = False
@@ -53,7 +57,8 @@ if "response_text" not in st.session_state:
 if "context_from_user" not in st.session_state:
     st.session_state.context_from_user = ""
 
-message = st.empty()
+email_warining_message = st.empty()
+quote_warining_message = st.empty()
 
 def diveder(pix):
     with st.container():
@@ -176,40 +181,65 @@ else:
 
         cols_for_gen = st.columns([1, 3])
         with cols_for_gen[0]:
-            if st.button("Generate Response"):
-                
-                if not st.session_state["generating_email"]:
-                    message.empty()
-                    st.session_state["generating_email"] = True
-                    if email_text:
-                        action = get_action_from_response(determine_action(email_text))
-                        product_catalog_text = retrieve_relevant_context(company, "company_docs", email_text, word_limit=2000)
-                        quote_template = get_company_documents(company, "quote_template")
+            if st.button("Generate Email"):
+                with st.spinner("Generating Email Response"):
+                    if not st.session_state["generating_email"]:
+                        email_warining_message.empty()
+                        st.session_state["generating_email"] = True
+                        if email_text:
+                            product_catalog_text = retrieve_relevant_context(company, "company_docs", email_text, word_limit=2000)
+                            quote_template = get_company_documents(company, "quote_template")
 
-                        if action == 'b2' and len(quote_template)>0 or st.session_state.force_quote_gen:
-                            template_text = extract_text(quote_template[0])
                             st.session_state.response_text = generate_response(email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
-                            pdf_file = generate_quote(template_text, email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
-                            st.download_button(label="Download Quote as PDF", data=open(pdf_file, "rb"), file_name="quote.pdf", mime="application/pdf")
                             st.session_state.email_in_mem = True
+
                         else:
-                            st.session_state.response_text = generate_response(email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
-                            st.session_state.email_in_mem = True
-                    else:
-                        st.error("Please paste an email to generate a response.")
-                    st.session_state["generating_email"] = False
-                else: 
-                    message.markdown("<h3 style='color:red;'>Please only press 'Generate Response' once. \nWait a few seconds and then the button will become available again.</h3>", unsafe_allow_html=True)
-                    time.sleep(2)
-                    message.empty()
-                    st.session_state["generating_email"] = False
-                    message.markdown("<h3 style='color:red;'>Try again now</h3>", unsafe_allow_html=True)
+                            st.error("Please paste an email to generate a response.")
+                        st.session_state["generating_email"] = False
+                    else: 
+                        email_warining_message.markdown("<h3 style='color:red;'>Please only press 'Generate Response' once. \nWait a few seconds and then the button will become available again.</h3>", unsafe_allow_html=True)
+                        time.sleep(2)
+                        email_warining_message.empty()
+                        st.session_state["generating_email"] = False
+                        email_warining_message.markdown("<h3 style='color:red;'>Try again now</h3>", unsafe_allow_html=True)
         
-        with cols_for_gen[1]:
-            st.session_state.force_quote_gen = st.toggle("Force Quote Generation")
-            existing_template = get_company_documents(company, "quote_template", True)
-            if len(existing_template)==0 and st.session_state.force_quote_gen:
-                st.info("For improved quote generation, upload a quote.")
+        # with cols_for_gen[1]:
+        #     if st.button("Generate Quote"):
+        #         with st.spinner("Generating Quote..."):
+        #             if not st.session_state["generating_quote"]:
+        #                 quote_warining_message.empty()
+        #                 st.session_state["generating_quote"] = True
+        #                 if email_text:
+        #                     product_catalog_text = retrieve_relevant_context(company, "company_docs", email_text, word_limit=2000)
+        #                     quote_template = get_company_documents(company, "quote_template")
+        #                     if len(quote_template)==0:
+        #                         quote_template = get_company_documents("default", "quote_template")
+                            
+        #                     template_text = extract_text(quote_template[0])
+        #                     # pdf_file, original_file_template = generate_quote(quote_template[0], template_text, email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
+        #                     pdf_file = generate_quote(quote_template[0], template_text, email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
+        #                     # st.download_button(label="Download Quote as PDF", data=open(pdf_file, "rb"), file_name="quote.pdf", mime="application/pdf")
+        #                     st.download_button(label="Download Quote as PDF", 
+        #                         data=pdf_file.getvalue(),  # Convert BytesIO to bytes
+        #                         file_name="quote.docx", 
+        #                         mime="application/docx")
+        #                     # file_type = quote_template[0].split('.')[-1]
+        #                     # st.download_button(
+        #                     #     label=f"Quote as {file_type.upper()}",
+        #                     #     data=original_file_template.getvalue() if isinstance(original_file_template, io.BytesIO) else open(original_file_template, "rb"),
+        #                     #     file_name=f"quote.{file_type}",
+        #                     #     mime=f"application/{file_type if file_type != 'txt' else 'plain'}"
+        #                     # )
+                        
+        #                 else:
+        #                     st.error("Please paste an email to generate a response.")
+        #                 st.session_state["generating_quote"] = False
+        #             else: 
+        #                 quote_warining_message.markdown("<h3 style='color:red;'>Please only press 'Generate Quote' once. \nWait a few seconds and then the button will become available again.</h3>", unsafe_allow_html=True)
+        #                 time.sleep(2)
+        #                 quote_warining_message.empty()
+        #                 st.session_state["generating_quote"] = False
+        #                 quote_warining_message.markdown("<h3 style='color:red;'>Try again now</h3>", unsafe_allow_html=True)
 
         diveder(1)
         
@@ -299,38 +329,38 @@ else:
         diveder(1)
 
         # Quote Template Upload (Limited to One)
-        st.subheader("Upload Quote Template / Previous Quote")
-        existing_template = get_company_documents(company, "quote_template", True)
+        # st.subheader("Upload Quote Template / Previous Quote")
+        # existing_template = get_company_documents(company, "quote_template", True)
 
-        if len(existing_template)>0:
-            st.info("A quote template already exists. Delete it before uploading a new one.")
-            if st.session_state.confirm_del_of_quote == False:
-                if st.button("Delete Existing Quote Template"):
-                    st.session_state.confirm_del_of_quote = True
-                    st.rerun()
+        # if len(existing_template)>0:
+        #     st.info("A quote template already exists. Delete it before uploading a new one.")
+        #     if st.session_state.confirm_del_of_quote == False:
+        #         if st.button("Delete Existing Quote Template"):
+        #             st.session_state.confirm_del_of_quote = True
+        #             st.rerun()
 
-            # Check if confirm_del is True
-            if st.session_state.confirm_del_of_quote:
-                cols3 = st.columns(4)
-                with cols3[0]:
-                    if st.button("Confirm delete"):
-                        delete_company_doc(f"{existing_template[0]}")
-                        st.session_state.confirm_del_of_quote = False  # Reset the confirmation state
-                        st.info(f"Quote template deleted successfully!")
-                        st.rerun()
-                with cols3[1]:
-                    if st.button("Cancel"):
-                        st.session_state.confirm_del_of_quote = False  # Reset the confirmation state
-                        st.info(f"Deletion of quote template cancelled.")
-                        st.rerun()
+        #     # Check if confirm_del is True
+        #     if st.session_state.confirm_del_of_quote:
+        #         cols3 = st.columns(4)
+        #         with cols3[0]:
+        #             if st.button("Confirm delete"):
+        #                 delete_company_doc(f"{existing_template[0]}")
+        #                 st.session_state.confirm_del_of_quote = False  # Reset the confirmation state
+        #                 st.info(f"Quote template deleted successfully!")
+        #                 st.rerun()
+        #         with cols3[1]:
+        #             if st.button("Cancel"):
+        #                 st.session_state.confirm_del_of_quote = False  # Reset the confirmation state
+        #                 st.info(f"Deletion of quote template cancelled.")
+        #                 st.rerun()
 
-        else:
-            uploaded_template = uploaded_files = st.file_uploader(
-                "Upload a Quote Template", 
-                label_visibility="collapsed", 
-                type=["pdf", "docx", "txt", "csv", "jpg", "png", "html", "md", "xls", "xlsx"], 
-                accept_multiple_files=False
-            )
-            if uploaded_template and st.button("Upload Quote Template"):
-                upload_file_to_supabase(company, "quote_template", uploaded_template)
-                st.rerun()
+        # else:
+        #     uploaded_template = uploaded_files = st.file_uploader(
+        #         "Upload a Quote Template", 
+        #         label_visibility="collapsed", 
+        #         type=["pdf", "docx", "txt", "csv", "html", "md", "xlsx"], 
+        #         accept_multiple_files=False
+        #     )
+        #     if uploaded_template and st.button("Upload Quote Template"):
+        #         upload_file_to_supabase(company, "quote_template", uploaded_template)
+        #         st.rerun()

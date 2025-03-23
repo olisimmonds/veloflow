@@ -1,3 +1,65 @@
+with cols_for_gen[0]:
+    if st.button("Generate Response"):
+        
+        if not st.session_state["generating_email"]:
+            message.empty()
+            st.session_state["generating_email"] = True
+            if email_text:
+                action = get_action_from_response(determine_action(email_text))
+                product_catalog_text = retrieve_relevant_context(company, "company_docs", email_text, word_limit=2000)
+                quote_template = get_company_documents(company, "quote_template")
+
+                if action == 'b2' and len(quote_template)>0 or st.session_state.force_quote_gen:
+                    template_text = extract_text(quote_template[0])
+                    st.session_state.response_text = generate_response(email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
+                    pdf_file, original_file_template = generate_quote(quote_template[0], template_text, email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
+                    st.download_button(label="Download Quote as PDF", data=open(pdf_file, "rb"), file_name="quote.pdf", mime="application/pdf")
+                    file_type = quote_template[0].split('.')[-1]
+                    st.download_button(
+                        label=f"Quote as {file_type.upper()}",
+                        data=original_file_template.getvalue() if isinstance(original_file_template, io.BytesIO) else open(original_file_template, "rb"),
+                        file_name=f"quote.{file_type}",
+                        mime=f"application/{file_type if file_type != 'txt' else 'plain'}"
+                    )
+                    st.session_state.email_in_mem = True
+                else:
+                    st.session_state.response_text = generate_response(email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
+                    st.session_state.email_in_mem = True
+            else:
+                st.error("Please paste an email to generate a response.")
+            st.session_state["generating_email"] = False
+        else: 
+            message.markdown("<h3 style='color:red;'>Please only press 'Generate Response' once. \nWait a few seconds and then the button will become available again.</h3>", unsafe_allow_html=True)
+            time.sleep(2)
+            message.empty()
+            st.session_state["generating_email"] = False
+            message.markdown("<h3 style='color:red;'>Try again now</h3>", unsafe_allow_html=True)
+
+with cols_for_gen[1]:
+    st.session_state.force_quote_gen = st.toggle("Force Quote Generation")
+    existing_template = get_company_documents(company, "quote_template", True)
+    if len(existing_template)==0 and st.session_state.force_quote_gen:
+        st.info("For improved quote generation, upload a quote.")        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import os
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
