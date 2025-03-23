@@ -1,12 +1,10 @@
-fix bugs: pdf generation, image to text
-    \_ Make demo vid
-        \_Show andy and abdis account manager
+Make demo vid
+Show andy and abdis account manager
 
+pdf generation, image to text
 Get abdi to apply for funding
 improve code - good variable names, type annotation, functionise
-delete KMP_DUPLICATE_LIB_OK line and fix error
-shut down aws
-shut down firestore google
+os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
 suggestion box for editing pdfs
 ai summary of suggested changes
@@ -23,35 +21,3 @@ Costs
 LLM API key - GPT4o-mini
 supabase - free
 streamlit upgrade
-
-
-Okay, so I think the product is now at a stage where we can start to get some initial feedback. 
-Could you have a play round with it and see if you think it works alright. 
-I have a list of additioonal improvments we can make for it for the second round of development but is there anything crucial we need to do now?
-
-Before the second MVP is realsed I want to:
-1) Add a suggestion box for users to suggest changes for the AI to make for the quotes
-This will be accompanined with a short AI discription of suggested contex. 
-For example, if the AI has had to leave [Your Company] somewhere, it will prompt the user to say what company they work for.
-2) I want to code in a copy button for easy coppying of the email.
-3) I want to implement any feedback we get from my cousin and your account manager. 
-After doing that, I think we would be ready to push this out to a larger audience.
-
-After doing that I have some additional changes I want to make before the product is productionised:
-1) Improve authentication and link to stripe payments. 
-We can launch this application so that anyone can sign up for 12$ a month say but we will also give companies which sign up themselves their own logins.
-This authentication will look more similar to how you sign into other applications and will be hosted by supabase.
-2) I'd want to look at using LLMs to search the web for additoonal context.
-3) I would want to move the application to a better website server, probaly one we would have to pay for which would always be live and wouldn't have any water marks on etc.
-
-For now, can you check it's good for initial feedback and also, do you have any experience with content creation? Do you reckon you can create a demo video sort of wlking through a userr experience? 
-Something where you show all the features, how a user can spot a flaw in the email and then improve it by adding extra context etc...
-Always something I can have a go at as well if you prefer.
-Also, what are the first steps we need to do to try and get funding? Are there any actions we can do now?
-Whiles we wait for some initial feedback I want to clean up my code a bit before I make any additional improvments.
-We are up to well over 1500 lines of code and for long term scalibility it could do with a clean and restructuring.
-
-Let me know your thoughts,
-Thanks, Oli
-
-https://ofgixvnkftwqcfbhjzdb.supabase.co/storage/v1/object/public/veloflow-company-docs/dev_team/quote_template/Tech%20Solutions%20Quote%20Template%20Ltd.pdf

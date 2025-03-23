@@ -13,8 +13,9 @@ import torch.nn.functional as F
 from transformers import AutoModel, AutoTokenizer
 import torch
 from sklearn.metrics.pairwise import cosine_similarity
-from src.extract_text import extract_text
+from src.ai.extract_text import extract_text
 from storage3.utils import StorageException
+import base64
 
 users = params.users
 HUGGING_FACE_API = params.HUGGING_FACE_API
@@ -43,6 +44,20 @@ def embed(texts):
 #     response = requests.post(api_url, headers=headers, json={"inputs": texts, "options":{"wait_for_model":True}})
 #     print(f"emedded email = {response}")
 #     return response.json()
+
+def diveder(pix):
+    with st.container():
+        st.markdown(
+            """
+            <hr style="border: {pix}px solid #000; width: 100%; margin: 10px 0;">
+            """,
+            unsafe_allow_html=True,
+        )   
+
+def get_img_as_base64(file):
+    with open(file, "rb") as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
 
 def authenticate_user(email):
     email = email.lower()

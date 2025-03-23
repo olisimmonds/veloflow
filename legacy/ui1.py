@@ -107,12 +107,12 @@ background-attachment: fixed;
 
 st.markdown(page_bg_img, unsafe_allow_html=True)
 
-from src.master_agent import determine_action, get_action_from_response
-from src.draft_email_agent import generate_response
-from src.make_quote import generate_quote
+from src.ai.master_agent import determine_action, get_action_from_response
+from src.ai.draft_email_agent import generate_response
+from src.ai.make_quote import generate_quote
 from PyPDF2 import PdfReader
 import time
-from src.app_config_functions import get_company_documents, upload_file_to_supabase, delete_company_doc, authenticate_user, extract_pdf_text
+from src.ui.app_config_functions import get_company_documents, upload_file_to_supabase, delete_company_doc, authenticate_user, extract_pdf_text
 from PIL import Image
 from pathlib import Path
 
