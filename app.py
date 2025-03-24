@@ -9,9 +9,9 @@ st.set_page_config(
 )
 
 from typing import List
-import pythoncom
+# import pythoncom
 
-pythoncom.CoInitialize()
+# pythoncom.CoInitialize()
 
 from src.ui.app_config_functions import get_img_as_base64
 from src.ui.pages.login_page import login_page

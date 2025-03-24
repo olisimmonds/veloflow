@@ -1,5 +1,7 @@
 python-docx
 pdf2docx
+pypandoc
+pandoc
 pdfkit
 markdown
 pandas

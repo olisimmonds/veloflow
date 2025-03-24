@@ -1,6 +1,5 @@
 Andy feedback
 
-pdf generation - integrate and test generate_quote
 image to text
 Add andy work email
 suggestion box for editing pdfs
