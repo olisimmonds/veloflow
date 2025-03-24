@@ -76,39 +76,39 @@ def context_tab(company_name: str):
     
     diveder(1)
 
-    # # Quote Template Upload (Limited to One)
-    # st.subheader("Upload Quote Template / Previous Quote")
-    # existing_template = get_company_documents(company_name, "quote_template", True)
+    # Quote Template Upload (Limited to One)
+    st.subheader("Upload Quote Template / Previous Quote")
+    existing_template = get_company_documents(company_name, "quote_template", True)
 
-    # if len(existing_template)>0:
-    #     st.info("A quote template already exists. Delete it before uploading a new one.")
-    #     if st.session_state.confirm_del_of_quote == False:
-    #         if st.button("Delete Existing Quote Template"):
-    #             st.session_state.confirm_del_of_quote = True
-    #             st.rerun()
+    if len(existing_template)>0:
+        st.info("A quote template already exists. Delete it before uploading a new one.")
+        if st.session_state.confirm_del_of_quote == False:
+            if st.button("Delete Existing Quote Template"):
+                st.session_state.confirm_del_of_quote = True
+                st.rerun()
 
-    #     # Check if confirm_del is True
-    #     if st.session_state.confirm_del_of_quote:
-    #         cols3 = st.columns(4)
-    #         with cols3[0]:
-    #             if st.button("Confirm delete"):
-    #                 delete_company_doc(f"{existing_template[0]}")
-    #                 st.session_state.confirm_del_of_quote = False  # Reset the confirmation state
-    #                 st.info(f"Quote template deleted successfully!")
-    #                 st.rerun()
-    #         with cols3[1]:
-    #             if st.button("Cancel"):
-    #                 st.session_state.confirm_del_of_quote = False  # Reset the confirmation state
-    #                 st.info(f"Deletion of quote template cancelled.")
-    #                 st.rerun()
+        # Check if confirm_del is True
+        if st.session_state.confirm_del_of_quote:
+            cols3 = st.columns(4)
+            with cols3[0]:
+                if st.button("Confirm delete"):
+                    delete_company_doc(f"{existing_template[0]}")
+                    st.session_state.confirm_del_of_quote = False  # Reset the confirmation state
+                    st.info(f"Quote template deleted successfully!")
+                    st.rerun()
+            with cols3[1]:
+                if st.button("Cancel"):
+                    st.session_state.confirm_del_of_quote = False  # Reset the confirmation state
+                    st.info(f"Deletion of quote template cancelled.")
+                    st.rerun()
 
-    # else:
-    #     uploaded_template = uploaded_files = st.file_uploader(
-    #         "Upload a Quote Template", 
-    #         label_visibility="collapsed", 
-    #         type=["pdf", "docx", "txt", "csv", "html", "md", "xlsx"], 
-    #         accept_multiple_files=False
-    #     )
-    #     if uploaded_template and st.button("Upload Quote Template"):
-    #         upload_file_to_supabase(company_name, "quote_template", uploaded_template)
-    #         st.rerun()
+    else:
+        uploaded_template = uploaded_files = st.file_uploader(
+            "Upload a Quote Template", 
+            label_visibility="collapsed", 
+            type=["pdf", "docx", "txt", "csv", "html", "md", "xlsx"], 
+            accept_multiple_files=False
+        )
+        if uploaded_template and st.button("Upload Quote Template"):
+            upload_file_to_supabase(company_name, "quote_template", uploaded_template)
+            st.rerun()
