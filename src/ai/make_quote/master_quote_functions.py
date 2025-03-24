@@ -4,7 +4,6 @@ import requests
 import docx 
 from pdf2docx import Converter
 import pdfkit
-import docx2pdf
 import markdown
 import pandas as pd
 from io import StringIO
