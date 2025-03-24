@@ -3,7 +3,7 @@ import time
 
 # from src.ai.master_agent import determine_action, get_action_from_response
 from src.ai.draft_email_agent import generate_response
-from src.ai.make_quote import generate_quote
+# from src.ai.make_quote import generate_quote
 from src.ai.extract_text import extract_text
 from src.ui.app_config_functions import (
     get_company_documents, 

@@ -1,21 +1,29 @@
-Make demo vid
-Show andy and abdis account manager
+Andy feedback
 
-pdf generation, image to text
-Get abdi to apply for funding
-improve code - good variable names, type annotation, functionise
-os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
-
+pdf generation
+- build func that converts pdf - og
+- build func which determins og file type, switch twice and see what maintains the most similarity? can do this in upload, with messages about format if not possible.
+- build wrapper func that returns the two types
+image to text
+Add andy work email
 suggestion box for editing pdfs
 ai summary of suggested changes
 Add copy button - needs java script coding
-Send out
+Can send intro emails
+3 tabs for knowlage base -docs, websites - needs to have refresh schedual or date, and saved context - Can save context to memory for user, custormer or company
+Make demo vid
+abdis account manager
 
+Get abdi to apply for funding
+os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
+set up dev/prod spaces - could just use git?
 upgrade supabase? 
 improve auth - move to supabase auth
 Implement payment with strip - anyone can sign up for 10£ a month
 LLM to search internet
+host streamlit on server - fly.io for example
 Improve UI - move away from streamlit?
+Send out
 
 Costs
 LLM API key - GPT4o-mini
