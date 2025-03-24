@@ -1,3 +1,11 @@
+python-docx
+pdf2docx
+pdfkit
+markdown
+pandas
+openpyxl
+reportlab
+pypandoc
 fitz
 frontend
 pdf2docx

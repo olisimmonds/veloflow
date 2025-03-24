@@ -1,9 +1,6 @@
 Andy feedback
 
-pdf generation
-- build func that converts pdf - og
-- build func which determins og file type, switch twice and see what maintains the most similarity? can do this in upload, with messages about format if not possible.
-- build wrapper func that returns the two types
+pdf generation - integrate and test generate_quote
 image to text
 Add andy work email
 suggestion box for editing pdfs
