@@ -16,6 +16,8 @@ from src.ai.make_quote.html import *
 from src.ai.make_quote.md import *
 from src.ai.make_quote.tex import *
 
+import pypandoc
+
 def convert_pdf_to_docx(pdf_path, docx_path):
     """
     Converts a PDF file to DOCX format using pdf2docx.
@@ -165,7 +167,8 @@ def convert_updated_doc_to_pdf(updated_doc, file_ext, output_pdf=None):
             tmp_docx_path = tmp.name
         updated_doc.save(tmp_docx_path)
         # Convert DOCX to PDF using docx2pdf
-        docx2pdf.convert(tmp_docx_path, pdf_file)
+        # docx2pdf.convert(tmp_docx_path, pdf_file)
+        pypandoc.convert_file(tmp_docx_path, 'pdf', outputfile=pdf_file)
         os.remove(tmp_docx_path)
     
     elif file_ext == ".html":
