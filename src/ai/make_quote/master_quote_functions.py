@@ -31,6 +31,7 @@ from src.ai.make_quote.md import *
 from src.ai.make_quote.tex import *
 from src.ai.extract_text import extract_text
 
+pypandoc.download_pandoc()
 
 def convert_pdf_to_docx(pdf_path, docx_path):
     """
@@ -272,7 +273,7 @@ def generate_quote(file_url, email_text, company_contex, user_contex, user_email
     updated_doc, file_type = process_document(file_url, email_text, company_contex, user_contex, user_email)
     
     file_path = f"temp/temp_quote_gen/temp{file_type}"
-    
+
     buffer = BytesIO()
     updated_doc.save(buffer)
     buffer.seek(0) 
