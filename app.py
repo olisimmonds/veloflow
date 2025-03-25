@@ -25,6 +25,7 @@ def set_up_session_states_init_to_false(list_of_session_states: List[str]):
 
 set_up_session_states_init_to_false([
     "logged_in", 
+    "login_clicked",
     "generating_email", 
     "generating_quote", 
     "confirm_del",

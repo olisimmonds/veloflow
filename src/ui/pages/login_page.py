@@ -6,9 +6,6 @@ from src.ui.app_config_functions import (
 
 login_back = get_img_as_base64("static/background5.jpg")
 
-if "login_clicked" not in st.session_state:
-    st.session_state.login_clicked = False
-
 def login():
     """Trigger login action"""
     st.session_state.login_clicked = True
