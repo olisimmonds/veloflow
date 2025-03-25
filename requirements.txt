@@ -1,6 +1,6 @@
 python-docx
 pymupdf
-fitz
+fitz==1.16.14
 tools
 pdf2docx
 pypandoc
