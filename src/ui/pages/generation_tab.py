@@ -61,7 +61,7 @@ def generation_tab(company_of_user: str):
                         quote_template = get_company_documents(company_of_user, "quote_template")
                         if len(quote_template)==0:
                             quote_template = get_company_documents("default", "quote_template")
-                        
+                        print(f"{quote_template=}")
                         st.session_state.og_file_type, st.session_state.pdf_file_type_quote, st.session_state.ai_comment_on_quote = generate_quote(quote_template[0], email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
                         st.session_state.og_file_type = docx_to_bytes(st.session_state.og_file_type)
                         st.session_state.quote_in_mem = True
