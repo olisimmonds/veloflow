@@ -1,8 +1,6 @@
 import os 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 import streamlit as st
-import pypandoc
-pypandoc.download_pandoc()
 
 st.set_page_config(
     layout="wide",
