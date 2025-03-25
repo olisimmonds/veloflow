@@ -1,6 +1,5 @@
 python-docx
-pymupdf
-fitz
+PyMuPDF
 tools
 pdf2docx
 pypandoc
