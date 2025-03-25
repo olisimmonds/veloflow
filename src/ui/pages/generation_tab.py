@@ -88,8 +88,6 @@ def generation_tab(company_of_user: str):
     diveder(1)
     
     if st.session_state.email_in_mem:
-        if st.button('Copy'):
-            pyperclip.copy(st.session_state.response_text)
         st.markdown(
             f"""
             <div id="response-box" style="

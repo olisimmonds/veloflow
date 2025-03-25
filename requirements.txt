@@ -1,5 +1,4 @@
 python-docx
-pyperclip
 pdf2docx
 pypandoc
 pandoc

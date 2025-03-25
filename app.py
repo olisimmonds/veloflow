@@ -1,6 +1,5 @@
 import os 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
-os.environ["PYTHONIOENCODING"] = "utf-8"
 import streamlit as st
 
 st.set_page_config(
