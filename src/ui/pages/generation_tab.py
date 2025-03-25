@@ -1,6 +1,7 @@
 import streamlit as st
 import time
 import io
+import pyperclip
 
 # from src.ai.master_agent import determine_action, get_action_from_response
 from src.ai.draft_email_agent import generate_response
@@ -87,6 +88,8 @@ def generation_tab(company_of_user: str):
     diveder(1)
     
     if st.session_state.email_in_mem:
+        if st.button('Copy'):
+            pyperclip.copy(st.session_state.response_text)
         st.markdown(
             f"""
             <div id="response-box" style="
