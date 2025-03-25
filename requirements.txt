@@ -2,6 +2,7 @@ python-docx
 PyMuPDF
 tools
 pdf2docx
+pandoc
 pypandoc
 pandoc
 pdfkit
