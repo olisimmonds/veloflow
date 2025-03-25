@@ -10,7 +10,7 @@ import requests
 def extract_text(file_path):
     file_type = file_path.split('.')[-1]
     print(f"{file_type=}")
-    if file_type == 'pdf':
+    if file_type.startswith('pdf'):
         return extract_pdf_text(file_path)
     elif file_type == 'docx':
         return extract_docx_text(file_path)
