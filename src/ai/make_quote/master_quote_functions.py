@@ -63,6 +63,7 @@ def process_document(file_url, email_text, compan_conx, user_context, user_email
     # Get the file extension
     _, ext = os.path.splitext(file_url)
     ext = ext.lower()
+    print(f"{ext=}")
     
     with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tmp:
         tmp.write(response.content)
