@@ -12,19 +12,23 @@ def extract_text(file_path):
     print(f"{file_type=}")
     if file_type.startswith('pdf'):
         return extract_pdf_text(file_path)
-    elif file_type == 'docx':
+    elif file_type.startswith('docx'):
         return extract_docx_text(file_path)
-    elif file_type == 'txt':
+    elif file_type.startswith('txt'):
         return extract_txt_text(file_path)
-    elif file_type == 'csv':
+    elif file_type.startswith('csv'):
         return extract_csv_text(file_path)
-    elif file_type in ('jpg', 'png'):
+    elif file_type.startswith('jpg'):
         return extract_image_text(file_path)
-    elif file_type == 'html':
+    elif file_type.startswith('png'):
+        return extract_image_text(file_path)
+    elif file_type.startswith('html'):
         return extract_html_text(file_path)
-    elif file_type == 'md':
+    elif file_type.startswith('md'):
         return extract_markdown_text(file_path)
-    elif file_type in ('xls', 'xlsx'):
+    elif file_type.startswith('xls'):
+        return extract_excel_text(file_path)
+    elif file_type.startswith('xlsx'):
         return extract_excel_text(file_path)
     else:
         raise ValueError("Unsupported file format")
