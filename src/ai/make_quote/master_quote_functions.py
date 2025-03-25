@@ -272,12 +272,12 @@ def generate_quote(file_url, email_text, company_contex, user_contex, user_email
     updated_doc, file_type = process_document(file_url, email_text, company_contex, user_contex, user_email)
     
     file_path = f"temp/temp_quote_gen/temp{file_type}"
-
+    
     buffer = BytesIO()
     updated_doc.save(buffer)
     buffer.seek(0) 
 
-    response = supabase.storage.from_(BUCKET_NAME).upload(file_path, buffer.getvalue(), {"upsert": "true"})
+    response = supabase.storage.from_(BUCKET_NAME).upload(file_path, buffer.getvalue(), {"upsert": "true", "content-type": "application/pdf"})
     if response.status_code == 200:
         
         public_url = supabase.storage.from_(BUCKET_NAME).get_public_url(file_path)
