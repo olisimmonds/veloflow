@@ -279,8 +279,9 @@ def generate_quote(file_url, email_text, company_contex, user_contex, user_email
 
     response = supabase.storage.from_(BUCKET_NAME).upload(file_path, buffer.getvalue(), {"upsert": "true"})
     if response.status_code == 200:
-        print(f"{public_url=}")
+        
         public_url = supabase.storage.from_(BUCKET_NAME).get_public_url(file_path)
+        print(f"{public_url=}")
         public_url = public_url.rstrip('?')
         print(f"{public_url=}")
         extracted_text = extract_text(public_url)
