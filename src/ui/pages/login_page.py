@@ -6,6 +6,13 @@ from src.ui.app_config_functions import (
 
 login_back = get_img_as_base64("static/background5.jpg")
 
+if "login_clicked" not in st.session_state:
+    st.session_state.login_clicked = False
+
+def login():
+    """Trigger login action"""
+    st.session_state.login_clicked = True
+
 def login_page():
 
     # Set up page config
@@ -49,7 +56,12 @@ def login_page():
         cols2 = st.columns([4, 1])
         with cols2[0]:
             st.write("")
-            email = st.text_input(label="email", label_visibility = "collapsed", placeholder="Enter your email")
+            email = st.text_input(
+                label="email", 
+                label_visibility = "collapsed", 
+                placeholder="Enter your email",
+                on_change=login
+            )
         with cols2[1]:
             st.write("")
             login_button = st.button("Login")
@@ -72,7 +84,7 @@ def login_page():
             unsafe_allow_html=True,
         )
 
-        if login_button:
+        if login_button or st.session_state.login_clicked:
             user, company = authenticate_user(email)
             if user:
                 st.session_state["user"] = user
@@ -82,5 +94,4 @@ def login_page():
                 st.rerun()
             else:
                 st.error("Invalid email or password.")
-
                 

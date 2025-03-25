@@ -19,6 +19,7 @@ def generate_response(email, product_catalog_text, user_context, user_email):
 
     prompt = f"""
     You are an assistant for a technical sales team. Your task is to read a customer's email and, using the provided company context and user-provided context, generate a detailed response.
+    If nothing is passed in the email feild then generate an introduction email based on the context.
     You must:
     - Extract relevant products or services from the catalog to recommend or quote to the customer based on their inquiry.
     - Respond by summarizing the product or service, its features, and any associated costs.

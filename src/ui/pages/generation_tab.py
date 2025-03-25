@@ -37,13 +37,11 @@ def generation_tab(company_of_user: str):
                 if not st.session_state["generating_email"]:
                     email_warining_message.empty()
                     st.session_state["generating_email"] = True
-                    if email_text:
-                        product_catalog_text = retrieve_relevant_context(company_of_user, "company_docs", email_text, word_limit=2000)
-                        st.session_state.response_text = generate_response(email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
-                        st.session_state.email_in_mem = True
+                    
+                    product_catalog_text = retrieve_relevant_context(company_of_user, "company_docs", email_text, word_limit=2000)
+                    st.session_state.response_text = generate_response(email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
+                    st.session_state.email_in_mem = True
 
-                    else:
-                        st.error("Please paste an email to generate a response.")
                     st.session_state["generating_email"] = False
                 else: 
                     email_warining_message.markdown("<h3 style='color:red;'>Please only press 'Generate Response' once. \nWait a few seconds and then the button will become available again.</h3>", unsafe_allow_html=True)

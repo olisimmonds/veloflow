@@ -1,18 +1,16 @@
-Andy feedback
-
-image to text
-Add andy work email
+2 tabs left, email gen and quote gen
 suggestion box for editing pdfs
 ai summary of suggested changes
+fix image to text
 Add copy button - needs java script coding
-Can send intro emails
 3 tabs for knowlage base -docs, websites - needs to have refresh schedual or date, and saved context - Can save context to memory for user, custormer or company
+
 Make demo vid
 abdis account manager
 
 Get abdi to apply for funding
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
-set up dev/prod spaces - could just use git?
+set up dev/prod spaces - could just use git, multiple apps?
 upgrade supabase? 
 improve auth - move to supabase auth
 Implement payment with strip - anyone can sign up for 10£ a month
