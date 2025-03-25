@@ -1,5 +1,5 @@
 fix image to text
-Add copy button - needs java script coding
+Add copy button - needs java script coding - https://discuss.streamlit.io/t/it-works-custom-copy-to-clipboard-buttons/53644
 3 tabs for knowlage base -docs, websites - needs to have refresh schedual or date, and saved context - Can save context to memory for user, custormer or company
 
 Make demo vid
