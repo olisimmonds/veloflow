@@ -10,7 +10,7 @@ from src.ui.app_config_functions import (
 
 def context_tab(company_name: str):
     st.write("")
-    st.subheader("Optional: Additional context for email")
+    st.subheader("Additional context for email/quote")
 
     st.session_state.context_from_user = st.text_area(
         "Context",
@@ -18,7 +18,7 @@ def context_tab(company_name: str):
         placeholder=(
             "Would you like to offer a discount? "
             "What tone should the email have? "
-            "Are there any key details that must be included?"
+            "Suggest edits to the generated quote or email..."
         ),
         value=st.session_state.context_from_user,  # Preserve input
         height=150,  # Adjust height as needed

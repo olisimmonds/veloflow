@@ -8,14 +8,29 @@ import markdown
 import pandas as pd
 from io import StringIO
 from docx import Document
+import pypandoc
+from supabase import create_client, Client
+import time
+from openai import OpenAI
+import params
+from io import BytesIO
+
+# Initialize Supabase client
+SUPABASE_URL = params.SUPABASE_URL
+SUPABASE_KEY = params.SUPABASE_KEY
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+BUCKET_NAME = "veloflow-company-docs"
+
+OPENAI_KEY = params.OPENAI_KEY
+client = OpenAI(api_key=OPENAI_KEY)
 
 from src.ai.make_quote.csv_xlsx import *
 from src.ai.make_quote.docx import *
 from src.ai.make_quote.html import *
 from src.ai.make_quote.md import *
 from src.ai.make_quote.tex import *
+from src.ai.extract_text import extract_text
 
-import pypandoc
 
 def convert_pdf_to_docx(pdf_path, docx_path):
     """
@@ -215,6 +230,28 @@ def convert_updated_doc_to_pdf(updated_doc, file_ext, output_pdf=None):
     print(f"PDF saved as: {pdf_file}")
     return pdf_file
 
+def suggested_context_for_quote(text: str):
+    prompt = f"""
+        Hey, I've got AI to make me a quote but pottentially it could have done with some extra information.
+        Could you take a quick look at this quote and let me know what additional context I should think about providing so that it's ready to send to a client?
+        What feilds are missing? 
+
+        Here's the content of the quote: 
+
+        \"\"\"{text}\"\"\" 
+
+        If the quote is ready to show to a client then say so, you don't have to suggest improvments.
+        Keep it brief and to the point. 
+        I want a short response.
+    """
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    return response.choices[0].message.content
+
 def generate_quote(file_url, email_text, company_contex, user_contex, user_email):
     """
     Downloads and processes a quote document from a URL and converts it to a PDF.
@@ -233,19 +270,22 @@ def generate_quote(file_url, email_text, company_contex, user_contex, user_email
     # Run the document processing function (assumed to return updated_doc and file_type)
     updated_doc, file_type = process_document(file_url, email_text, company_contex, user_contex, user_email)
     
+    file_path = f"temp/temp_quote_gen/temp{file_type}"
+
+    buffer = BytesIO()
+    updated_doc.save(buffer)
+    buffer.seek(0) 
+
+    response = supabase.storage.from_(BUCKET_NAME).upload(file_path, buffer.getvalue(), {"upsert": "true"})
+    if response.status_code == 200:
+        public_url = supabase.storage.from_(BUCKET_NAME).get_public_url(file_path)
+        extracted_text = extract_text(public_url)
+    response = supabase.storage.from_(BUCKET_NAME).remove([file_path])
+
+    requested_additional_context = suggested_context_for_quote(extracted_text)
+    
     # Convert the updated document to PDF
     pdf_file = convert_updated_doc_to_pdf(updated_doc, file_type)
     
-    return updated_doc, pdf_file
+    return updated_doc, pdf_file, requested_additional_context
 
-# Example usage:
-# updated_doc, pdf_file = generate_quote(file_url, email_text, company_contex, user_contex, user_email)
-# Then you can pass pdf_file to st.download_button:
-# st.download_button(label="Download Quote as PDF", data=open(pdf_file, "rb"), file_name="quote.pdf", mime="application/pdf")
-
-# Example usage:
-# updated = process_document("https://example.com/path/to/quote_template.docx",
-#                            "Email context here",
-#                            "Company context here",
-#                            "User context here")
-# Depending on file type, 'updated' will be a docx.Document object or a string.

@@ -1,6 +1,3 @@
-2 tabs left, email gen and quote gen
-suggestion box for editing pdfs
-ai summary of suggested changes
 fix image to text
 Add copy button - needs java script coding
 3 tabs for knowlage base -docs, websites - needs to have refresh schedual or date, and saved context - Can save context to memory for user, custormer or company
@@ -18,8 +15,13 @@ LLM to search internet
 host streamlit on server - fly.io for example
 Improve UI - move away from streamlit?
 Send out
+Show Josh Brown?
+suggestion box for editing pdfs directly?
 
 Costs
 LLM API key - GPT4o-mini
 supabase - free
 streamlit upgrade
+
+Email for abdi
+I have added pdf, doesn't work with images yet. Want to keep simple, suggest edit in context box. Suggest changes ai generated for quote, not for email, what do you prefeer?

@@ -31,7 +31,11 @@ set_up_session_states_init_to_false([
     "confirm_del",
     "confirm_del_of_quote",
     "force_quote_gen",
-    "email_in_mem"
+    "email_in_mem",
+    "quote_in_mem",
+    "original_file_type_quote",
+    "pdf_file_type_quote",
+    "ai_comment_on_quote"
 ])
 
 if "response_text" not in st.session_state:
