@@ -1,6 +1,17 @@
 import os 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 import streamlit as st
+import asyncio
+
+# Attempt to get the current event loop; create a new one if none exists
+try:
+    loop = asyncio.get_event_loop()
+except RuntimeError:
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+# Your Streamlit app code here
+
 
 st.set_page_config(
     layout="wide",

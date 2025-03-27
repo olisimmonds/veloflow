@@ -90,5 +90,5 @@ def login_page():
                 st.info("Login successful!")
                 st.rerun()
             else:
-                st.error("Invalid email or password.")
+                st.error("Invalid email.")
                 

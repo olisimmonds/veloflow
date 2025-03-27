@@ -8,12 +8,14 @@ import markdown
 import pandas as pd
 from io import StringIO
 from docx import Document
-import pypandoc
+# import pypandoc
 from supabase import create_client, Client
 import time
 from openai import OpenAI
 import params
 from io import BytesIO
+from spire.doc import *
+from spire.doc.common import *
 
 # Initialize Supabase client
 SUPABASE_URL = params.SUPABASE_URL
@@ -30,8 +32,6 @@ from src.ai.make_quote.html import *
 from src.ai.make_quote.md import *
 from src.ai.make_quote.tex import *
 from src.ai.extract_text import extract_text
-
-pypandoc.download_pandoc()
 
 def convert_pdf_to_docx(pdf_path, docx_path):
     """
@@ -182,9 +182,14 @@ def convert_updated_doc_to_pdf(updated_doc, file_ext, output_pdf=None):
         with tempfile.NamedTemporaryFile(delete=False, suffix=".docx") as tmp:
             tmp_docx_path = tmp.name
         updated_doc.save(tmp_docx_path)
-        # Convert DOCX to PDF using docx2pdf
+        
         # docx2pdf.convert(tmp_docx_path, pdf_file)
-        pypandoc.convert_file(tmp_docx_path, 'pdf', outputfile=pdf_file)
+        # pypandoc.convert_file(tmp_docx_path, 'pdf', outputfile=pdf_file)
+        document = Document()
+        document.LoadFromFile(tmp_docx_path)
+        document.SaveToFile(pdf_file, FileFormat.PDF)
+        document.Close()
+
         os.remove(tmp_docx_path)
     
     elif file_ext == ".html":

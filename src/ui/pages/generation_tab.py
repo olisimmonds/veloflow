@@ -56,19 +56,17 @@ def generation_tab(company_of_user: str):
                 if not st.session_state["generating_quote"]:
                     quote_warining_message.empty()
                     st.session_state["generating_quote"] = True
-                    if email_text:
-                        product_catalog_text = retrieve_relevant_context(company_of_user, "company_docs", email_text, word_limit=2000)
-                        quote_template = get_company_documents(company_of_user, "quote_template")
-                        if len(quote_template)==0:
-                            quote_template = get_company_documents("default", "quote_template")
-                        quote_template[0] = quote_template[0].rstrip('?')
-                        print(f"{quote_template[0]=}")
-                        st.session_state.og_file_type, st.session_state.pdf_file_type_quote, st.session_state.ai_comment_on_quote = generate_quote(quote_template[0], email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
-                        st.session_state.og_file_type = docx_to_bytes(st.session_state.og_file_type)
-                        st.session_state.quote_in_mem = True
                     
-                    else:
-                        st.error("Please paste an email to generate a response.")
+                    product_catalog_text = retrieve_relevant_context(company_of_user, "company_docs", email_text, word_limit=2000)
+                    quote_template = get_company_documents(company_of_user, "quote_template")
+                    if len(quote_template)==0:
+                        quote_template = get_company_documents("default", "quote_template")
+                    quote_template[0] = quote_template[0].rstrip('?')
+                    print(f"{quote_template[0]=}")
+                    st.session_state.og_file_type, st.session_state.pdf_file_type_quote, st.session_state.ai_comment_on_quote = generate_quote(quote_template[0], email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
+                    st.session_state.og_file_type = docx_to_bytes(st.session_state.og_file_type)
+                    st.session_state.quote_in_mem = True
+                    
                     st.session_state["generating_quote"] = False
                 else: 
                     quote_warining_message.markdown("<h3 style='color:red;'>Please only press 'Generate Quote' once. \nWait a few seconds and then the button will become available again.</h3>", unsafe_allow_html=True)

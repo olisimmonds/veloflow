@@ -1,12 +1,18 @@
+fix pdf gen cloud
+
+Spire doc licence
 fix image to text
 Add copy button - needs java script coding - https://discuss.streamlit.io/t/it-works-custom-copy-to-clipboard-buttons/53644
-3 tabs for knowlage base -docs, websites - needs to have refresh schedual or date, and saved context - Can save context to memory for user, custormer or company
+websites - needs to have refresh schedual or date - add save func and retrival - link enter to button
+saved context - add save func (date_time_and_user file name save directly to new table) and retrival
+Add info page
 
 Make demo vid
 abdis account manager
 
 Get abdi to apply for funding
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
+RuntimeError: Tried to instantiate class '__path__._path' error
 set up dev/prod spaces - could just use git, multiple apps?
 upgrade supabase? 
 improve auth - move to supabase auth
@@ -17,6 +23,7 @@ Improve UI - move away from streamlit?
 Send out
 Show Josh Brown?
 suggestion box for editing pdfs directly?
+Can save context to memory for user, custormer or company
 
 Costs
 LLM API key - GPT4o-mini

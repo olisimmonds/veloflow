@@ -1,16 +1,14 @@
 python-docx
-pdflatex
+Spire.Doc
 PyMuPDF
 tools
 pdf2docx
 pypandoc
-pandoc
 pdfkit
 markdown
 pandas
 openpyxl
 reportlab
-pypandoc
 frontend
 pdf2docx
 easyocr
