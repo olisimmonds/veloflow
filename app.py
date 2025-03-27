@@ -41,6 +41,8 @@ set_up_session_states_init_to_false([
     "generating_quote", 
     "confirm_del",
     "confirm_del_of_quote",
+    "confirm_del_of_url",
+    "confirm_del_of_free_text",
     "force_quote_gen",
     "email_in_mem",
     "quote_in_mem",

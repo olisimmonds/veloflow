@@ -1,0 +1,48 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Copy Text to Clipboard</title>
+    <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self' *">
+    <style>
+        #copyButton {
+            transition: opacity 1s;
+        }
+        textarea {
+            position: absolute;
+            left: -9999px;
+        }
+    </style>
+</head>
+<body>
+    <textarea id="textToCopy"></textarea>
+    <button id="copyButton" onclick="copyToClipboard()">📋</button>
+
+    <script>
+        function getQueryParam(name) {
+            const urlSearchParams = new URLSearchParams(window.location.search);
+            return urlSearchParams.get(name);
+        }
+
+        const textToCopy = document.getElementById("textToCopy");
+        const copyText = getQueryParam("copy");
+        if (copyText) {
+            textToCopy.value = decodeURIComponent(copyText).replace(/\+/g, ' ');
+        }
+
+        const copyButton = document.getElementById("copyButton");
+        copyButton.title = textToCopy.value;
+
+        function copyToClipboard() {
+            textToCopy.select();
+            textToCopy.setSelectionRange(0, 99999); // For mobile devices
+            navigator.clipboard.writeText(textToCopy.value).then(() => {
+                copyButton.textContent = "✔";
+                setTimeout(() => {
+                    copyButton.textContent = "📋";
+                    copyButton.title = textToCopy.value;
+                }, 1000);
+            }).catch(err => console.error("Error copying text: ", err));
+        }
+    </script>
+</body>
+</html>

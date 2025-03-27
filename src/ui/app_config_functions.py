@@ -184,4 +184,15 @@ def remove_document_embedding(company, type, filename):
         "filename": filename
     }).execute()
 
+def check_filename_in_table(company, file_name):
+    response = supabase.table('document_embeddings').select('filename').eq('company', company).eq('filename', file_name).execute()
+    if response.data:
+        return True
+    return False
 
+def get_items_from_embedding_table(company, type):
+    response = supabase.table('document_embeddings').select('filename').eq('company', company).eq('type', type).execute()
+    if response.data:
+        filenames = [item['filename'] for item in response.data]
+        return filenames
+    return []

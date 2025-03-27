@@ -8,7 +8,7 @@ import markdown
 import pandas as pd
 from io import StringIO
 from docx import Document
-# import pypandoc
+import pypandoc
 from supabase import create_client, Client
 import time
 from openai import OpenAI
@@ -173,6 +173,13 @@ def convert_updated_doc_to_pdf(updated_doc, file_ext, output_pdf=None):
         pdf_file (str): The file path of the generated PDF.
     """
     
+        # docx2pdf.convert(tmp_docx_path, pdf_file)
+        # document = Document()
+        # document.LoadFromFile(tmp_docx_path)
+        # document.SaveToFile(pdf_file, FileFormat.PDF)
+        # document.Close()
+        # pypandoc.convert_file(tmp_docx_path, 'pdf', outputfile=pdf_file)
+
     tmp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
     pdf_file = tmp_pdf.name
     tmp_pdf.close()
@@ -183,12 +190,11 @@ def convert_updated_doc_to_pdf(updated_doc, file_ext, output_pdf=None):
             tmp_docx_path = tmp.name
         updated_doc.save(tmp_docx_path)
         
-        # docx2pdf.convert(tmp_docx_path, pdf_file)
-        # pypandoc.convert_file(tmp_docx_path, 'pdf', outputfile=pdf_file)
         document = Document()
         document.LoadFromFile(tmp_docx_path)
         document.SaveToFile(pdf_file, FileFormat.PDF)
         document.Close()
+        # pypandoc.convert_file(tmp_docx_path, 'pdf', outputfile=pdf_file)
 
         os.remove(tmp_docx_path)
     

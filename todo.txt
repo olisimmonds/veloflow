@@ -1,15 +1,11 @@
-fix pdf gen cloud
-
-Spire doc licence
-fix image to text
+fix pdf gen local & cloud
 Add copy button - needs java script coding - https://discuss.streamlit.io/t/it-works-custom-copy-to-clipboard-buttons/53644
-websites - needs to have refresh schedual or date - add save func and retrival - link enter to button
-saved context - add save func (date_time_and_user file name save directly to new table) and retrival
-Add info page
 
 Make demo vid
 abdis account manager
 
+Add info page
+fix image to text
 Get abdi to apply for funding
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 RuntimeError: Tried to instantiate class '__path__._path' error
@@ -32,3 +28,7 @@ streamlit upgrade
 
 Email for abdi
 I have added pdf, doesn't work with images yet. Want to keep simple, suggest edit in context box. Suggest changes ai generated for quote, not for email, what do you prefeer?
+Added webs and free text.
+Added copy button.
+For productions need:
+to do stuff above in second para

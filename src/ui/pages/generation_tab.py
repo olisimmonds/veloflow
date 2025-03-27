@@ -1,6 +1,7 @@
 import streamlit as st
 import time
 import io
+import json
 
 # from src.ai.master_agent import determine_action, get_action_from_response
 from src.ai.draft_email_agent import generate_response
@@ -128,6 +129,12 @@ def generation_tab(company_of_user: str):
     diveder(1)
 
     if st.session_state.email_in_mem:
+        safe_text = json.dumps(st.session_state.response_text) 
+        # if st.button("Copy"):
+        hosted_html_file = "src\ai\copy.html"
+        iframe_url = f"{hosted_html_file}?copy={safe_text}"
+
+        st.markdown(f'<iframe src="{iframe_url}"></iframe>', unsafe_allow_html=True)
         st.markdown(
             f"""
             <div id="response-box" style="
