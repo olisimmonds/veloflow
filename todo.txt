@@ -25,10 +25,3 @@ Costs
 LLM API key - GPT4o-mini
 supabase - free
 streamlit upgrade
-
-Email for abdi
-I have added pdf, doesn't work with images yet. Want to keep simple, suggest edit in context box. Suggest changes ai generated for quote, not for email, what do you prefeer?
-Added webs and free text.
-Added copy button.
-For productions need:
-to do stuff above in second para
