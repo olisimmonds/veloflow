@@ -129,12 +129,31 @@ def generation_tab(company_of_user: str):
     diveder(1)
 
     if st.session_state.email_in_mem:
-        safe_text = json.dumps(st.session_state.response_text) 
-        # if st.button("Copy"):
-        hosted_html_file = "src\ai\copy.html"
-        iframe_url = f"{hosted_html_file}?copy={safe_text}"
-
-        st.markdown(f'<iframe src="{iframe_url}"></iframe>', unsafe_allow_html=True)
+        # Add copy button
+        st.markdown("""
+            <script>
+                function copyToClipboard(text) {
+                    navigator.clipboard.writeText(text).then(function() {
+                        console.log('Copied to clipboard successfully');
+                    }).catch(function(err) {
+                        console.error('Failed to copy text: ', err);
+                    });
+                }
+            </script>
+        """, unsafe_allow_html=True)
+        
+        col1, col2 = st.columns([1, 5])
+        with col1:
+            # Properly escape the text for JavaScript
+            escaped_text = st.session_state.response_text.replace("'", "\\'").replace("\n", "\\n")
+            st.button("Copy to Clipboard", key="copy_button", on_click=lambda: st.markdown(
+                f"""
+                <script>
+                    copyToClipboard("{escaped_text}");
+                </script>
+                """,
+                unsafe_allow_html=True
+            ))
         st.markdown(
             f"""
             <div id="response-box" style="

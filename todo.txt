@@ -1,10 +1,13 @@
 fix pdf gen local & cloud
-Add copy button - needs java script coding - https://discuss.streamlit.io/t/it-works-custom-copy-to-clipboard-buttons/53644
+Add copy button - needs java script coding
+host streamlit on server - fly.io for example
 
 Make demo vid
 abdis account manager
 
-Add info page
+website - go through website tabs
+Upload transcrips for quote gen
+Add info page - use word
 fix image to text
 Get abdi to apply for funding
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
@@ -13,8 +16,6 @@ set up dev/prod spaces - could just use git, multiple apps?
 upgrade supabase? 
 improve auth - move to supabase auth
 Implement payment with strip - anyone can sign up for 10£ a month
-LLM to search internet
-host streamlit on server - fly.io for example
 Improve UI - move away from streamlit?
 Send out
 Show Josh Brown?

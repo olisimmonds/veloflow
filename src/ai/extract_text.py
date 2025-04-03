@@ -1,4 +1,4 @@
-import easyocr
+# import easyocr
 from docx import Document
 import PyPDF2
 import pandas as pd
@@ -18,10 +18,10 @@ def extract_text(file_path):
         return extract_txt_text(file_path)
     elif file_type.startswith('csv'):
         return extract_csv_text(file_path)
-    elif file_type.startswith('jpg'):
-        return extract_image_text(file_path)
-    elif file_type.startswith('png'):
-        return extract_image_text(file_path)
+    # elif file_type.startswith('jpg'):
+    #     return extract_image_text(file_path)
+    # elif file_type.startswith('png'):
+    #     return extract_image_text(file_path)
     elif file_type.startswith('html'):
         return extract_html_text(file_path)
     elif file_type.startswith('md'):
@@ -62,12 +62,12 @@ def extract_csv_text(url):
     return df.to_string()
 
 
-def extract_image_text(url):
-    response = requests.get(url)
-    response.raise_for_status()
-    reader = easyocr.Reader(['en'])  # Load the model for English
-    result = reader.readtext(BytesIO(response.content), detail=0)
-    return " ".join(result)
+# def extract_image_text(url):
+#     response = requests.get(url)
+#     response.raise_for_status()
+#     reader = easyocr.Reader(['en'])  # Load the model for English
+#     result = reader.readtext(BytesIO(response.content), detail=0)
+#     return " ".join(result)
 
 
 def extract_html_text(url):
