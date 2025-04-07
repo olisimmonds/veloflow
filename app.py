@@ -48,7 +48,10 @@ set_up_session_states_init_to_false([
     "quote_in_mem",
     "original_file_type_quote",
     "pdf_file_type_quote",
-    "ai_comment_on_quote"
+    "ai_comment_on_quote",
+    "edited_quote_template",
+    "edited_quote_template_bytes",
+    "quote_as_pdf"
 ])
 
 if "response_text" not in st.session_state:

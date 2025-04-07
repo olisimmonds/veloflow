@@ -10,12 +10,12 @@ from io import StringIO
 from docx import Document
 import pypandoc
 from supabase import create_client, Client
-import time
+import random
 from openai import OpenAI
 import params
 from io import BytesIO
-from spire.doc import *
-from spire.doc.common import *
+from weasyprint import HTML
+import fitz
 
 # Initialize Supabase client
 SUPABASE_URL = params.SUPABASE_URL
@@ -31,14 +31,37 @@ from src.ai.make_quote.docx import *
 from src.ai.make_quote.html import *
 from src.ai.make_quote.md import *
 from src.ai.make_quote.tex import *
+from src.ai.make_quote.pdf import *
 from src.ai.extract_text import extract_text
 
-def convert_pdf_to_docx(pdf_path, docx_path):
+def convert_pdf_to_docx(pdf_path: str, docx_path: str):
     """
     Converts a PDF file to DOCX format using pdf2docx.
     """
     cv = Converter(pdf_path)
     cv.convert(docx_path, start=0, end=None)
+    cv.close()
+
+def convert_docx_to_latex(docx_path: str, latex_path: str):
+    """
+    Converts a DOCX file to LaTeX format using pandoc.
+    """
+    latex_content = pypandoc.convert_file(docx_path, 'latex', format='docx')
+    with open(latex_path, 'w', encoding='utf-8') as f:
+        f.write(latex_content)
+
+def convert_latex_to_pdf(latex_path: str, pdf_path: str):
+    """
+    Converts a LaTeX file to PDF using pandoc.
+    """
+    pypandoc.convert_file(latex_path, 'pdf', outputfile=pdf_path)
+
+def convert_pdf_to_html(pdf_path, html_path):
+    """
+    Converts a PDF file to HTML format using pdf2docx.
+    """
+    cv = Converter(pdf_path)
+    cv.convert(html_path, start=0, end=None, target_type="html")
     cv.close()
 
 def process_document(file_url, email_text, compan_conx, user_context, user_email):
@@ -137,6 +160,14 @@ def process_document(file_url, email_text, compan_conx, user_context, user_email
         #     updated_doc = f.read()
     
     elif ext == ".pdf":
+
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+            temp_output_path = tmp.name
+        pdf_structure = extract_pdf_structure(tmp_path)
+        replacements = get_replacements_from_gpt_pdf(pdf_structure, email_text, compan_conx, user_context, user_email)
+        print("Detected replacements:", replacements)
+        updated_pdf = replace_text_in_pdf(tmp_path, replacements, temp_output_path)
+    
         # Process PDF file using conversion approach:
         with tempfile.NamedTemporaryFile(delete=False, suffix=".docx") as tmp_docx:
             tmp_docx_path = tmp_docx.name
@@ -148,6 +179,7 @@ def process_document(file_url, email_text, compan_conx, user_context, user_email
         updated_doc = replace_text_in_docx(doc, replacements)
         # Optionally, convert updated_doc (a DOCX object) back to PDF using a conversion tool if needed.
         os.remove(tmp_docx_path)
+        return (updated_doc, updated_pdf), ext
 
     else:
         raise Exception(f"Unsupported file type: {ext}")
@@ -156,6 +188,14 @@ def process_document(file_url, email_text, compan_conx, user_context, user_email
     os.remove(tmp_path)
     file_type = ext
     return updated_doc, file_type
+
+def docx_to_html(docx_path):
+    doc = Document(docx_path)
+    html = "<html><body>"
+    for para in doc.paragraphs:
+        html += f"<p>{para.text}</p>"
+    html += "</body></html>"
+    return html
 
 def convert_updated_doc_to_pdf(updated_doc, file_ext, output_pdf=None):
     """
@@ -189,23 +229,30 @@ def convert_updated_doc_to_pdf(updated_doc, file_ext, output_pdf=None):
         with tempfile.NamedTemporaryFile(delete=False, suffix=".docx") as tmp:
             tmp_docx_path = tmp.name
         updated_doc.save(tmp_docx_path)
+
+        html_content = docx_to_html(tmp_docx_path)
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".html") as tmp_html:
+            tmp_html_path = tmp_html.name
+            tmp_html.write(html_content.encode('utf-8'))
+        HTML(tmp_html_path).write_pdf(target=pdf_file)
+        os.remove(tmp_html_path)
         
-        document = Document()
-        document.LoadFromFile(tmp_docx_path)
-        document.SaveToFile(pdf_file, FileFormat.PDF)
-        document.Close()
+        # document = Document()
+        # document.LoadFromFile(tmp_docx_path)
+        # document.SaveToFile(pdf_file, FileFormat.PDF)
+        # document.Close()
         # pypandoc.convert_file(tmp_docx_path, 'pdf', outputfile=pdf_file)
 
         os.remove(tmp_docx_path)
     
     elif file_ext == ".html":
         # updated_doc is a HTML string
-        pdfkit.from_string(updated_doc, pdf_file)
+        HTML(updated_doc).write_pdf(target=pdf_file)
     
     elif file_ext == ".md":
         # updated_doc is a Markdown string; convert to HTML then to PDF
         html_content = markdown.markdown(updated_doc)
-        pdfkit.from_string(html_content, pdf_file)
+        pdfkit.from_string(html_content, pdf_file, configuration=config)
     
     elif file_ext == ".tex":
         # updated_doc is a TeX string; save to .tex file and run pdflatex
@@ -229,13 +276,13 @@ def convert_updated_doc_to_pdf(updated_doc, file_ext, output_pdf=None):
         # updated_doc is a CSV string; use pandas to create an HTML table then convert to PDF
         df = pd.read_csv(StringIO(updated_doc))
         html_content = df.to_html(index=False)
-        pdfkit.from_string(html_content, pdf_file)
+        pdfkit.from_string(html_content, pdf_file, configuration=config)
     
     elif file_ext == ".xlsx":
         # updated_doc is assumed to be a filename for the updated XLSX.
         df = pd.read_excel(updated_doc)
         html_content = df.to_html(index=False)
-        pdfkit.from_string(html_content, pdf_file)
+        pdfkit.from_string(html_content, pdf_file, configuration=config)
     
     else:
         raise Exception(f"Unsupported file type for PDF conversion: {file_ext}")
@@ -281,15 +328,23 @@ def generate_quote(file_url, email_text, company_contex, user_contex, user_email
         pdf_file (str): The file path of the generated PDF.
     """
     # Run the document processing function (assumed to return updated_doc and file_type)
-    updated_doc, file_type = process_document(file_url, email_text, company_contex, user_contex, user_email)
+    updated_docs, file_type = process_document(file_url, email_text, company_contex, user_contex, user_email)
     
-    file_path = f"temp/temp_quote_gen/temp{file_type}"
+    if type(updated_docs) == tuple:
+        updated_doc = updated_docs[0]
+        file_type_text_extraction = ".docx"
+    else: 
+        updated_doc = updated_docs
+        file_type_text_extraction = file_type
 
+    # Generate random 6 digit number for temp file
+    temp_id = random.randint(100000, 999999)
+    file_path = f"temp/temp_quote_gen/temp{temp_id}{file_type_text_extraction}"
+    
     buffer = BytesIO()
     updated_doc.save(buffer)
     buffer.seek(0) 
-
-    response = supabase.storage.from_(BUCKET_NAME).upload(file_path, buffer.getvalue(), {"upsert": "true", "content-type": "application/pdf"})
+    response = supabase.storage.from_(BUCKET_NAME).upload(file_path, buffer.getvalue(), {"upsert": "true", "content-type": f"application/{file_type_text_extraction.rstrip('.')}"})
     if response.status_code == 200:
         
         public_url = supabase.storage.from_(BUCKET_NAME).get_public_url(file_path)
@@ -301,8 +356,8 @@ def generate_quote(file_url, email_text, company_contex, user_contex, user_email
 
     requested_additional_context = suggested_context_for_quote(extracted_text)
     
-    # Convert the updated document to PDF
-    pdf_file = convert_updated_doc_to_pdf(updated_doc, file_type)
+    if type(updated_docs) == tuple:
+        return (updated_doc, updated_docs[1]), file_type, requested_additional_context
     
-    return updated_doc, pdf_file, requested_additional_context
+    return updated_doc, file_type, requested_additional_context
 

@@ -1,10 +1,13 @@
 python-docx
+pdflatex 
 Spire.Doc
 PyMuPDF
 tools
 pdf2docx
 pypandoc
-pdfkit
+# pdfkit requires wkhtmltopdf to be installed separately
+# Download from https://wkhtmltopdf.org/downloads.html
+pdfkit>=1.0.0
 markdown
 pandas
 openpyxl

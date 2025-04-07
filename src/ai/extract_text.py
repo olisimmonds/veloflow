@@ -6,6 +6,8 @@ from bs4 import BeautifulSoup
 import openpyxl
 from io import BytesIO
 import requests
+import streamlit as st
+
 
 def extract_text(file_path):
     file_type = file_path.split('.')[-1]
@@ -35,11 +37,15 @@ def extract_text(file_path):
 
 
 def extract_pdf_text(url):
+    # try:
     response = requests.get(url)
     response.raise_for_status()
     reader = PyPDF2.PdfReader(BytesIO(response.content))
     text = "".join(page.extract_text() for page in reader.pages if page.extract_text())
     return text
+    # except Exception as e:
+    #     st.write(f"Error extracting text from PDF: {e}")
+    #     return ""
 
 
 def extract_docx_text(url):

@@ -1,8 +1,7 @@
 import streamlit as st
-import time
-import io
-import json
-
+import io, os, tempfile, time, pypandoc
+from docx import Document
+from pdflatex import PDFLaTeX
 # from src.ai.master_agent import determine_action, get_action_from_response
 from src.ai.draft_email_agent import generate_response
 from src.ai.make_quote.master_quote_functions import generate_quote
@@ -18,6 +17,86 @@ def docx_to_bytes(doc):
     doc.save(bio)
     bio.seek(0)
     return bio
+
+# def convert_latex_to_pdf(latex_path: str, pdf_path: str):
+#     """
+#     Converts a LaTeX file to PDF using pandoc.
+#     """
+#     # Convert the LaTeX source back to PDF
+#     pypandoc.convert_file(latex_path, 'pdf', outputfile=pdf_path)
+
+# def convert_docx_to_pdf(doc: Document) -> bytes:
+#     """
+#     Converts a python-docx Document into PDF by:
+#     1. Saving the Document as a DOCX file.
+#     2. Converting DOCX to LaTeX using Pandoc.
+#     3. Converting LaTeX to PDF using Pandoc.
+#     Returns the PDF as bytes.
+#     """
+#     # Step 1: Save the Document to a temporary DOCX file.
+#     with tempfile.NamedTemporaryFile(delete=False, suffix=".docx") as tmp_docx:
+#         doc.save(tmp_docx.name)
+#         docx_path = tmp_docx.name
+
+#     # Step 2: Convert the DOCX file to LaTeX.
+#     with tempfile.NamedTemporaryFile(delete=False, suffix=".tex") as tmp_tex:
+#         tex_path = tmp_tex.name
+#     latex_content = pypandoc.convert_file(docx_path, 'latex', format='docx')
+#     with open(tex_path, 'w', encoding='utf-8') as f:
+#         f.write(latex_content)
+
+#     # Step 3: Convert the LaTeX file to PDF.
+#     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_pdf:
+#         pdf_path = tmp_pdf.name
+#     pypandoc.convert_file(tex_path, 'pdf', outputfile=pdf_path, extra_args=['--pdf-engine=xelatex'])
+
+#     # Read the generated PDF as bytes.
+#     with open(pdf_path, 'rb') as f:
+#         pdf_bytes = f.read()
+
+#     # Clean up temporary files.
+#     os.remove(docx_path)
+#     if os.path.exists(tex_path):
+#         os.remove(tex_path)
+#     if os.path.exists(pdf_path):
+#         os.remove(pdf_path)
+
+#     return pdf_bytes
+
+# def convert_docx_to_pdf(doc: Document) -> bytes:
+#     """
+#     Converts a python-docx Document into a PDF.
+#     Uses Pandoc to convert DOCX -> LaTeX, then pdflatex to compile LaTeX -> PDF.
+#     Returns PDF as bytes.
+#     """
+#     with tempfile.TemporaryDirectory() as tmpdir:
+#         docx_path = os.path.join(tmpdir, "input.docx")
+#         tex_path = os.path.join(tmpdir, "file.tex")
+#         pdf_path = os.path.join(tmpdir, "file.pdf")
+
+#         # Save the DOCX file
+#         doc.save(docx_path)
+
+#         # Convert DOCX to LaTeX
+#         latex_content = pypandoc.convert_file(docx_path, 'latex', format='docx')
+#         with open(tex_path, 'w', encoding='utf-8') as f:
+#             f.write(latex_content)
+
+#         # Compile LaTeX to PDF
+#         pdfl = PDFLaTeX.from_texfile(tex_path)
+        
+#         pdf_bytes, log, proc = pdfl.create_pdf(
+#             keep_pdf_file=True,  # keep it so we can open it
+#             keep_log_file=True
+#         )
+#         # Check that the PDF exists
+#         if not os.path.exists(pdf_path):
+#             raise FileNotFoundError(f"Expected PDF not found at {pdf_path}. "
+#                                     f"LaTeX log:\n{log}")
+
+#         # Read and return PDF
+#         with open(pdf_path, 'rb') as f:
+#             return f.read()
 
 def generation_tab(company_of_user: str):
     email_warining_message = st.empty()
@@ -64,8 +143,15 @@ def generation_tab(company_of_user: str):
                         quote_template = get_company_documents("default", "quote_template")
                     quote_template[0] = quote_template[0].rstrip('?')
                     print(f"{quote_template[0]=}")
-                    st.session_state.og_file_type, st.session_state.pdf_file_type_quote, st.session_state.ai_comment_on_quote = generate_quote(quote_template[0], email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
-                    st.session_state.og_file_type = docx_to_bytes(st.session_state.og_file_type)
+                    quotes, st.session_state.file_type_of_quote, st.session_state.ai_comment_on_quote = generate_quote(quote_template[0], email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
+                    
+                    if type(quotes) == tuple:
+                        st.session_state.edited_quote_template = quotes[0]
+                        st.session_state.quote_as_pdf = quotes[1]
+                    else: 
+                        st.session_state.edited_quote_template = quotes
+                    
+                    st.session_state.edited_quote_template_bytes = docx_to_bytes(st.session_state.edited_quote_template)
                     st.session_state.quote_in_mem = True
                     
                     st.session_state["generating_quote"] = False
@@ -79,19 +165,23 @@ def generation_tab(company_of_user: str):
 
     if st.session_state.quote_in_mem:
         with cols_for_gen[0]:
-            st.download_button(label="Download Quote as PDF", data=open(st.session_state.pdf_file_type_quote, "rb"), file_name="quote.pdf", mime="application/pdf")
-        with cols_for_gen[1]:
-            try:
-                file_type = quote_template[0].split('.')[-1]
-            except Exception as e:
-                print(e)
-                file_type = "docx"
+            file_type = st.session_state.file_type_of_quote
+            if file_type == ".pdf":
+                file_type = "docx" 
             st.download_button(
                 label=f"Download Quote as {file_type.upper()}",
-                data=st.session_state.og_file_type.getvalue() if isinstance(st.session_state.og_file_type, io.BytesIO) else open(st.session_state.og_file_type, "rb"),
+                data=st.session_state.edited_quote_template_bytes.getvalue() if isinstance(st.session_state.edited_quote_template_bytes, io.BytesIO) else open(st.session_state.edited_quote_template_bytes, "rb"),
                 file_name=f"quote.{file_type}",
                 mime=f"application/{file_type if file_type != 'txt' else 'plain'}"
             )
+        if st.session_state.file_type_of_quote == ".pdf":
+            
+            with cols_for_gen[1]:
+                with open(st.session_state.quote_as_pdf, "rb") as f:
+                    pdf_bytes = f.read()
+                st.download_button(label="Download Quote as PDF", data=pdf_bytes, file_name="quote.pdf", mime="application/pdf")
+        
+            
         diveder(1)
         ai_suggestion_comment = "For improved quote generation, Veloflow AI recomends adding the following to the context box..."
         st.markdown(

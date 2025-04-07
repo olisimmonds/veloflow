@@ -142,7 +142,7 @@ def get_replacements_from_gpt_csv_xlsx(doc_structure, email, company_context, us
         ]
     )
     reply = response.choices[0].message.content
-    print("GPT-4 response:", reply)
+    
     reply = reply.split("```json")[-1].split("```")[0]
     try:
         replacements = json.loads(reply)

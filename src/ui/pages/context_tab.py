@@ -132,10 +132,10 @@ def quote_tab(company_name):
                     st.rerun(scope="fragment")
 
     else:
-        uploaded_template = uploaded_files = st.file_uploader(
-            "Upload a Quote Template", 
+        uploaded_template = st.file_uploader(
+            "Upload a Quote Template - Note: Our softwear works best when the quote template is in an editable format, i.e. docx, html, md, txt, csv, xlsx", 
             label_visibility="collapsed", 
-            type=["pdf", "docx", "txt", "csv", "html", "md", "xlsx"], 
+            type=["pdf" "docx", "txt", "csv", "html", "md", "xlsx"], 
             accept_multiple_files=False
         )
         if uploaded_template and st.button("Upload Quote Template"):

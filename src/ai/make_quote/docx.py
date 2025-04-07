@@ -123,7 +123,7 @@ def get_replacements_from_gpt_docx(doc_structure, email, company_context, user_c
     )
 
     reply = response.choices[0].message.content
-    print("GPT-4 response:", reply)
+    
     # Extract the JSON portion (assuming it's in a code block with ```json markers)
     reply = reply.split("```json")[-1].split("```")[0]
     try:
