@@ -23,9 +23,7 @@ def context_tab(company_name: str):
         "Context",
         label_visibility="collapsed",
         placeholder=(
-            "Would you like to offer a discount? "
-            "What tone should the email have? "
-            "Suggest edits to the generated quote or email..."
+            "In this space you can; copy in transcripts, offer a discount, suggest the tone of an email, or simply tell the AI anything you want it to know before generating content."
         ),
         value=st.session_state.context_from_user,  # Preserve input
         height=150,  # Adjust height as needed

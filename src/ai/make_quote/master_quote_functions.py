@@ -14,7 +14,7 @@ import random
 from openai import OpenAI
 import params
 from io import BytesIO
-from weasyprint import HTML
+# from weasyprint import HTML
 import fitz
 
 # Initialize Supabase client

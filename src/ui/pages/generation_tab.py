@@ -1,5 +1,6 @@
 import streamlit as st
-import io, os, tempfile, time, pypandoc
+import streamlit.components.v1 as components
+import io, os, tempfile, time, pypandoc, json
 from docx import Document
 from pdflatex import PDFLaTeX
 # from src.ai.master_agent import determine_action, get_action_from_response
@@ -219,31 +220,52 @@ def generation_tab(company_of_user: str):
     diveder(1)
 
     if st.session_state.email_in_mem:
-        # Add copy button
-        st.markdown("""
+        safe_email = json.dumps(st.session_state.response_text)
+
+        html_code = f"""
+        <html>
+        <body style="margin: 0; padding: 0;">
+            <button id="copy-button" style="padding: 0.5em 1em; font-size: 1em; border-radius: 8px; border: none; float: right;">
+            📋 Copy
+            </button>
             <script>
-                function copyToClipboard(text) {
-                    navigator.clipboard.writeText(text).then(function() {
-                        console.log('Copied to clipboard successfully');
-                    }).catch(function(err) {
-                        console.error('Failed to copy text: ', err);
-                    });
-                }
+            document.getElementById("copy-button").addEventListener("click", function() {{
+                const emailText = {safe_email};
+                if (navigator.clipboard && window.isSecureContext) {{
+                navigator.clipboard.writeText(emailText).then(function() {{
+                    alert("Email copied to clipboard!");
+                }}, function(err) {{
+                    alert("Copy failed: " + err);
+                }});
+                }} else {{
+                var tempTextArea = document.createElement("textarea");
+                tempTextArea.value = emailText;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                try {{
+                    var successful = document.execCommand('copy');
+                    if(successful) {{
+                    alert("Email copied to clipboard!");
+                    }} else {{
+                    alert("Copy command was unsuccessful.");
+                    }}
+                }} catch (err) {{
+                    alert("Copy failed: " + err);
+                }}
+                document.body.removeChild(tempTextArea);
+                }}
+            }});
             </script>
-        """, unsafe_allow_html=True)
+        </body>
+        </html>
+        """
         
-        col1, col2 = st.columns([1, 5])
+        col1, col2 = st.columns([4,1])
         with col1:
-            # Properly escape the text for JavaScript
-            escaped_text = st.session_state.response_text.replace("'", "\\'").replace("\n", "\\n")
-            st.button("Copy to Clipboard", key="copy_button", on_click=lambda: st.markdown(
-                f"""
-                <script>
-                    copyToClipboard("{escaped_text}");
-                </script>
-                """,
-                unsafe_allow_html=True
-            ))
+            st.subheader("Veloflow's AI generated email:")
+        with col2:
+            components.html(html_code, height=60)
+
         st.markdown(
             f"""
             <div id="response-box" style="

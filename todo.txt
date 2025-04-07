@@ -1,14 +1,12 @@
 improve quote gen quality
-get on cloud 
+host on server - fly.io, upgrade comunity cloud (snowflake), or move from streamlit
+add feedback buttons - use work inspo
+switch to python libary for embedding instead of using huggingface (switch then re_upload)
+select quote, upload, or AI gen
+website - go through website tabs
 Make demo vid
 
 Add copy button - needs java script coding
-switch to python libary for embedding instead of using huggingface
-add feedback buttons
-host on server - fly.io, upgrade comunity cloud, or move from streamlit 
-select quote, upload, or AI gen
-website - go through website tabs
-Upload transcrips for quote gen
 Add info page - use word
 fix image to text
 set up dev/prod spaces - could just use git, multiple apps?

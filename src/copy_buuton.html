@@ -7,14 +7,11 @@
         #copyButton {
             transition: opacity 1s;
         }
-        textarea {
-            position: absolute;
-            left: -9999px;
-        }
     </style>
 </head>
 <body>
-    <textarea id="textToCopy"></textarea>
+    <input type="text" id="textToCopy" value="" style="position: absolute; left: -9999px;">
+
     <button id="copyButton" onclick="copyToClipboard()">📋</button>
 
     <script>
@@ -26,7 +23,7 @@
         const textToCopy = document.getElementById("textToCopy");
         const copyText = getQueryParam("copy");
         if (copyText) {
-            textToCopy.value = decodeURIComponent(copyText).replace(/\+/g, ' ');
+            textToCopy.value = decodeURIComponent(copyText);
         }
 
         const copyButton = document.getElementById("copyButton");
@@ -34,14 +31,15 @@
 
         function copyToClipboard() {
             textToCopy.select();
-            textToCopy.setSelectionRange(0, 99999); // For mobile devices
-            navigator.clipboard.writeText(textToCopy.value).then(() => {
-                copyButton.textContent = "✔";
-                setTimeout(() => {
-                    copyButton.textContent = "📋";
-                    copyButton.title = textToCopy.value;
-                }, 1000);
-            }).catch(err => console.error("Error copying text: ", err));
+            document.execCommand("copy");
+
+            const clipboardContents = textToCopy.value;
+
+            copyButton.textContent = "✔";
+            setTimeout(function () {
+                copyButton.textContent = "📋";
+                copyButton.title = textToCopy.value;
+            }, 1000);
         }
     </script>
 </body>
