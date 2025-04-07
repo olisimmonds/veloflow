@@ -103,42 +103,56 @@ def docs_tab(company_name):
 
 @st.fragment
 def quote_tab(company_name):
-    # Quote Template Upload (Limited to One)
     st.subheader("Upload Quote Template / Previous Quote")
-    existing_template = get_company_documents(company_name, "quote_template", True)
 
-    if len(existing_template)>0:
-        st.info("A quote template already exists. Delete it before uploading a new one.")
-        if st.session_state.confirm_del_of_quote == False:
-            if st.button("Delete Existing Quote Template"):
-                st.session_state.confirm_del_of_quote = True
-                st.rerun(scope="fragment")
-
-        # Check if confirm_del is True
-        if st.session_state.confirm_del_of_quote:
-            cols3 = st.columns(4)
-            with cols3[0]:
-                if st.button("Confirm delete "):
-                    delete_company_doc(f"{existing_template[0]}")
-                    st.session_state.confirm_del_of_quote = False  # Reset the confirmation state
-                    st.info(f"Quote template deleted successfully!")
-                    st.rerun(scope="fragment")
-            with cols3[1]:
-                if st.button("Cancel "):
-                    st.session_state.confirm_del_of_quote = False  # Reset the confirmation state
-                    st.info(f"Deletion of quote template cancelled.")
-                    st.rerun(scope="fragment")
-
-    else:
-        uploaded_template = st.file_uploader(
-            "Upload a Quote Template - Note: Our softwear works best when the quote template is in an editable format, i.e. docx, html, md, txt, csv, xlsx", 
-            label_visibility="collapsed", 
-            type=["pdf" "docx", "txt", "csv", "html", "md", "xlsx"], 
-            accept_multiple_files=False
+    cols_right_side = st.columns([3,2])
+    with cols_right_side[0]:
+        uploaded_templates = st.file_uploader(
+            "Note: Our softwear works best when the quote template is in an editable format, i.e. docx, html, md, txt, csv, xlsx", 
+            type=["pdf", "docx", "txt", "csv", "html", "md", "xlsx"], 
+            accept_multiple_files=True
         )
-        if uploaded_template and st.button("Upload Quote Template"):
-            upload_file_to_supabase(company_name, "quote_template", uploaded_template)
+
+    with cols_right_side[1]:
+        st.write("")
+        st.write("")
+        st.write("")
+        st.write("")
+        if st.button("Upload Quote Template") and uploaded_templates:
+            for file in uploaded_templates:
+                upload_file_to_supabase(company_name, "quote_template", file)
             st.rerun(scope="fragment")
+
+    # List uploaded documents with options to delete
+    existing_templates = get_company_documents(company_name, "quote_template", True)
+
+    # Check if the document exists
+    if len(existing_templates)>0:
+        file_names_to_display = extract_filenames(existing_templates)
+        cols_for_doc_selector = st.columns(2)
+        with cols_for_doc_selector[0]:
+            selected_template = st.selectbox("Select a template to delete", label_visibility = "collapsed", options=file_names_to_display)
+        with cols_for_doc_selector[1]:
+            if selected_template:
+                if st.session_state.confirm_del_of_quote == False:
+                    if st.button("Delete selceted template"):
+                        st.session_state.confirm_del_of_quote = True
+                        st.rerun(scope="fragment")
+
+                # Check if confirm_del_of_quote is True
+                if st.session_state.confirm_del_of_quote:
+                    
+                    if st.button("Confirm delete"):
+                        print(f"{company_name}/quote_template/{selected_template}")
+                        delete_company_doc(f"{company_name}/quote_template/{selected_template}")
+                        st.session_state.confirm_del_of_quote = False  # Reset the confirmation state
+                        st.info(f"Template '{selected_template}' deleted successfully!")
+                        st.rerun(scope="fragment")
+                
+                    if st.button("Cancel"):
+                        st.session_state.confirm_del_of_quote = False  # Reset the confirmation state
+                        st.info(f"Template deletion of '{selected_template}' cancelled.")
+                        st.rerun(scope="fragment")
 
 @st.fragment
 def url_tab(company_name):

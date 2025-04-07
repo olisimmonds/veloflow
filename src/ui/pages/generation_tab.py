@@ -142,7 +142,12 @@ def generation_tab(company_of_user: str):
                     
                     company_context = retrieve_relevant_context(company_of_user, email_text, word_limit=2000)
                     quote_template = get_company_documents(company_of_user, "quote_template")
-                    if len(quote_template)==0:
+                    ######
+
+                    # Edit below for select button
+
+                    ######
+                    if len(quote_template)!=0:
                         quote_template = get_company_documents("default", "quote_template")
                     quote_template[0] = quote_template[0].rstrip('?')
                     print(f"{quote_template[0]=}")

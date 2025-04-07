@@ -1,9 +1,9 @@
 add feedback buttons - use work inspo
-select quote, upload, or AI gen
+select quote, upload, or AI gen pop up
 website - go through website tabs
 suggestion box for editing pdfs directly?
-add feedback tab with written feedback - lovable?
 improve quote gen quality
+add feedback tab with written feedback - lovable?
 host on server - fly.io, upgrade comunity cloud (snowflake), or move from streamlit
 Make demo vid (testing as part of this)
 
