@@ -8,24 +8,28 @@ from typing import List
 from sklearn.metrics.pairwise import cosine_similarity
 from storage3.utils import StorageException
 import base64
-from huggingface_hub import InferenceClient
+# from huggingface_hub import InferenceClient
+from sentence_transformers import SentenceTransformer
+
+# Load the model locally
+model = SentenceTransformer("all-MiniLM-L6-v2") 
 
 from src.ai.extract_text import extract_text
 
 users = params.users
-HUGGING_FACE_API = params.HUGGING_FACE_API
+# HUGGING_FACE_API = params.HUGGING_FACE_API
 SUPABASE_URL = params.SUPABASE_URL
 SUPABASE_KEY = params.SUPABASE_KEY
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 BUCKET_NAME = "veloflow-company-docs"
 
-model_id = "sentence-transformers/all-MiniLM-L6-v2"
+# model_id = "sentence-transformers/all-MiniLM-L6-v2"
 
 # Initialize the Hugging Face Inference Client
-client = InferenceClient(
-    model=model_id,  # Replace with your actual model ID
-    token=HUGGING_FACE_API  # Replace with your actual Hugging Face token
-)
+# client = InferenceClient(
+#     model=model_id,  # Replace with your actual model ID
+#     token=HUGGING_FACE_API  # Replace with your actual Hugging Face token
+# )
 
 
 ### Main App Config Functions
@@ -59,15 +63,16 @@ def extract_filenames(directories: List[str]) -> List[str]:
 
 ### Embedding functions
 def embed(texts):
-    return client.feature_extraction(texts)
+    # return client.feature_extraction(texts)
+    return model.encode(texts, convert_to_tensor=True)
 
 # Retrieve relevant document passages for an email
-def retrieve_relevant_context(company, type, email_text, word_limit=2000):
+def retrieve_relevant_context(company, email_text, word_limit=2000):
     
     email_embedding = embed(email_text)
     
     # Fetch all document embeddings from Supabase for the given company and type
-    response = supabase.table("document_embeddings").select("id, company, type, filename, text, embedding").eq("company", company).eq("type", type).execute()
+    response = supabase.table("document_embeddings").select("id, company, filename, text, embedding").eq("company", company).execute()
 
     if response.data:
         # Calculate cosine similarity between the email embedding and document embeddings

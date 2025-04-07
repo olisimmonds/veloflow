@@ -119,8 +119,10 @@ def generation_tab(company_of_user: str):
                     email_warining_message.empty()
                     st.session_state["generating_email"] = True
                     
-                    product_catalog_text = retrieve_relevant_context(company_of_user, "company_docs", email_text, word_limit=2000)
-                    st.session_state.response_text = generate_response(email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
+                    company_context = retrieve_relevant_context(company_of_user, email_text, word_limit=2000)
+                    print(f"{company_of_user=}")
+                    print(f"{company_context=}")
+                    st.session_state.response_text = generate_response(email_text, company_context, st.session_state.context_from_user, st.session_state["user"])
                     st.session_state.email_in_mem = True
 
                     st.session_state["generating_email"] = False
@@ -138,13 +140,13 @@ def generation_tab(company_of_user: str):
                     quote_warining_message.empty()
                     st.session_state["generating_quote"] = True
                     
-                    product_catalog_text = retrieve_relevant_context(company_of_user, "company_docs", email_text, word_limit=2000)
+                    company_context = retrieve_relevant_context(company_of_user, email_text, word_limit=2000)
                     quote_template = get_company_documents(company_of_user, "quote_template")
                     if len(quote_template)==0:
                         quote_template = get_company_documents("default", "quote_template")
                     quote_template[0] = quote_template[0].rstrip('?')
                     print(f"{quote_template[0]=}")
-                    quotes, st.session_state.file_type_of_quote, st.session_state.ai_comment_on_quote = generate_quote(quote_template[0], email_text, product_catalog_text, st.session_state.context_from_user, st.session_state["user"])
+                    quotes, st.session_state.file_type_of_quote, st.session_state.ai_comment_on_quote = generate_quote(quote_template[0], email_text, company_context, st.session_state.context_from_user, st.session_state["user"])
                     
                     if type(quotes) == tuple:
                         st.session_state.edited_quote_template = quotes[0]

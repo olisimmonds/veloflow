@@ -1,5 +1,0 @@
-
-pywin32
-pywin32-ctypes
-pywinpty
-tornado.67.1

@@ -1,12 +1,12 @@
-improve quote gen quality
-host on server - fly.io, upgrade comunity cloud (snowflake), or move from streamlit
 add feedback buttons - use work inspo
-switch to python libary for embedding instead of using huggingface (switch then re_upload)
 select quote, upload, or AI gen
 website - go through website tabs
-Make demo vid
+suggestion box for editing pdfs directly?
+add feedback tab with written feedback - lovable?
+improve quote gen quality
+host on server - fly.io, upgrade comunity cloud (snowflake), or move from streamlit
+Make demo vid (testing as part of this)
 
-Add copy button - needs java script coding
 Add info page - use word
 fix image to text
 set up dev/prod spaces - could just use git, multiple apps?
@@ -14,7 +14,6 @@ upgrade supabase?
 improve auth - move to supabase auth
 Implement payment with strip - anyone can sign up for 10£ a month
 Improve UI - move away from streamlit?
-suggestion box for editing pdfs directly?
 Can save context to memory for user, custormer or company
 
 
