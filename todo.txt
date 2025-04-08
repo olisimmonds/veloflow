@@ -1,12 +1,13 @@
-add feedback buttons - use work inspo
-website - go through website tabs
-Edit quote in veloflow
-improve quote gen quality
-add feedback tab with written feedback - lovable?
-host on server - fly.io, upgrade comunity cloud (snowflake), or move from streamlit
-Make demo vid (testing as part of this)
+1)  website - go through website tabs
+    Edit quote in veloflow
+2)  improve quote gen quality
+3)  add feedback tab with written feedback - lovable?
+    host on server - fly.io, upgrade comunity cloud (snowflake), or move from streamlit
+    Make demo vid (testing as part of this - need to do solid week of testing)
 
 confirm dels to popobver
+user accessible history
+improve speed - other langues, parrelle prossessing
 Add info page - use word
 fix image to text
 set up dev/prod spaces - could just use git, multiple apps?

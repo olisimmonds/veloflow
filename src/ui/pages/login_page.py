@@ -1,5 +1,5 @@
 import streamlit as st
-from src.ui.app_config_functions import (
+from src.app_config_functions import (
     authenticate_user, 
     get_img_as_base64
 )

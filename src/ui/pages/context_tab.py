@@ -3,7 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import date
 
-from src.ui.app_config_functions import (
+from src.app_config_functions import (
     get_company_documents, 
     upload_file_to_supabase, 
     delete_company_doc, 

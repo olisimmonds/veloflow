@@ -24,7 +24,7 @@ from typing import List
 
 # pythoncom.CoInitialize()
 
-from src.ui.app_config_functions import get_img_as_base64
+from src.app_config_functions import get_img_as_base64
 from src.ui.pages.login_page import login_page
 from src.ui.pages.generation_tab import generation_tab
 from src.ui.pages.context_tab import context_tab
@@ -52,7 +52,8 @@ set_up_session_states_init_to_false([
     "edited_quote_template",
     "edited_quote_template_bytes",
     "quote_as_pdf",
-    "quote_template"
+    "quote_template",
+    "quote_text_content"
 ])
 
 if "response_text" not in st.session_state:

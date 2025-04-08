@@ -1,5 +1,7 @@
 import params
 from openai import OpenAI
+import streamlit as st
+from src.monitoring.feedback import log_generated_email
 
 OPENAI_KEY = params.OPENAI_KEY
 
@@ -38,5 +40,6 @@ def generate_response(email, company_context, user_context, user_email):
 
     # Extract the assistant's response from the API response
     ai_msg = response.choices[0].message.content
+    log_generated_email(email, ai_msg, st.session_state["company"], user_email)
     print(ai_msg)
     return ai_msg

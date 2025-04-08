@@ -1,13 +1,10 @@
 import streamlit as st
 import streamlit.components.v1 as components
-import io, os, tempfile, time, pypandoc, json
-from docx import Document
-from pdflatex import PDFLaTeX
-# from src.ai.master_agent import determine_action, get_action_from_response
+import io, time, json
 from src.ai.draft_email_agent import generate_response
 from src.ai.make_quote.master_quote_functions import generate_quote
-from src.ai.extract_text import extract_text
-from src.ui.app_config_functions import (
+from src.monitoring.feedback import log_feedback_email, log_feedback_quote
+from src.app_config_functions import (
     get_company_documents, 
     retrieve_relevant_context,
     diveder
@@ -18,86 +15,6 @@ def docx_to_bytes(doc):
     doc.save(bio)
     bio.seek(0)
     return bio
-
-# def convert_latex_to_pdf(latex_path: str, pdf_path: str):
-#     """
-#     Converts a LaTeX file to PDF using pandoc.
-#     """
-#     # Convert the LaTeX source back to PDF
-#     pypandoc.convert_file(latex_path, 'pdf', outputfile=pdf_path)
-
-# def convert_docx_to_pdf(doc: Document) -> bytes:
-#     """
-#     Converts a python-docx Document into PDF by:
-#     1. Saving the Document as a DOCX file.
-#     2. Converting DOCX to LaTeX using Pandoc.
-#     3. Converting LaTeX to PDF using Pandoc.
-#     Returns the PDF as bytes.
-#     """
-#     # Step 1: Save the Document to a temporary DOCX file.
-#     with tempfile.NamedTemporaryFile(delete=False, suffix=".docx") as tmp_docx:
-#         doc.save(tmp_docx.name)
-#         docx_path = tmp_docx.name
-
-#     # Step 2: Convert the DOCX file to LaTeX.
-#     with tempfile.NamedTemporaryFile(delete=False, suffix=".tex") as tmp_tex:
-#         tex_path = tmp_tex.name
-#     latex_content = pypandoc.convert_file(docx_path, 'latex', format='docx')
-#     with open(tex_path, 'w', encoding='utf-8') as f:
-#         f.write(latex_content)
-
-#     # Step 3: Convert the LaTeX file to PDF.
-#     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_pdf:
-#         pdf_path = tmp_pdf.name
-#     pypandoc.convert_file(tex_path, 'pdf', outputfile=pdf_path, extra_args=['--pdf-engine=xelatex'])
-
-#     # Read the generated PDF as bytes.
-#     with open(pdf_path, 'rb') as f:
-#         pdf_bytes = f.read()
-
-#     # Clean up temporary files.
-#     os.remove(docx_path)
-#     if os.path.exists(tex_path):
-#         os.remove(tex_path)
-#     if os.path.exists(pdf_path):
-#         os.remove(pdf_path)
-
-#     return pdf_bytes
-
-# def convert_docx_to_pdf(doc: Document) -> bytes:
-#     """
-#     Converts a python-docx Document into a PDF.
-#     Uses Pandoc to convert DOCX -> LaTeX, then pdflatex to compile LaTeX -> PDF.
-#     Returns PDF as bytes.
-#     """
-#     with tempfile.TemporaryDirectory() as tmpdir:
-#         docx_path = os.path.join(tmpdir, "input.docx")
-#         tex_path = os.path.join(tmpdir, "file.tex")
-#         pdf_path = os.path.join(tmpdir, "file.pdf")
-
-#         # Save the DOCX file
-#         doc.save(docx_path)
-
-#         # Convert DOCX to LaTeX
-#         latex_content = pypandoc.convert_file(docx_path, 'latex', format='docx')
-#         with open(tex_path, 'w', encoding='utf-8') as f:
-#             f.write(latex_content)
-
-#         # Compile LaTeX to PDF
-#         pdfl = PDFLaTeX.from_texfile(tex_path)
-        
-#         pdf_bytes, log, proc = pdfl.create_pdf(
-#             keep_pdf_file=True,  # keep it so we can open it
-#             keep_log_file=True
-#         )
-#         # Check that the PDF exists
-#         if not os.path.exists(pdf_path):
-#             raise FileNotFoundError(f"Expected PDF not found at {pdf_path}. "
-#                                     f"LaTeX log:\n{log}")
-
-#         # Read and return PDF
-#         with open(pdf_path, 'rb') as f:
-#             return f.read()
 
 def generation_tab(company_of_user: str):
     email_warining_message = st.empty()
@@ -172,7 +89,7 @@ def generation_tab(company_of_user: str):
             with st.spinner("Generating Quote..."):
                 company_context = retrieve_relevant_context(company_of_user, email_text, word_limit=2000)
                 
-                quotes, st.session_state.file_type_of_quote, st.session_state.ai_comment_on_quote = generate_quote(st.session_state.quote_template, email_text, company_context, st.session_state.context_from_user, st.session_state["user"])
+                quotes, st.session_state.file_type_of_quote, st.session_state.ai_comment_on_quote, st.session_state.quote_text_content = generate_quote(st.session_state.quote_template, email_text, company_context, st.session_state.context_from_user, st.session_state["user"])
                 
                 if type(quotes) == tuple:
                     st.session_state.edited_quote_template = quotes[0]
@@ -238,6 +155,16 @@ def generation_tab(company_of_user: str):
             """, 
             unsafe_allow_html=True
         )
+        col1, col2 = st.columns([4,1])
+        # Feedback 
+        with col1:
+            if st.button("👍 Approve", key = "approve_quote"):
+                log_feedback_quote(score = 1, client_email = email_text, generated_quote = st.session_state.quote_text_content, company_name = st.session_state["company"], user_name = st.session_state["user"], upload_file_type = st.session_state.file_type_of_quote)
+                st.write("Feedback received")
+        with col2:
+            if st.button("👎 Disapprove", key = "disapprove_quote"):
+                log_feedback_quote(score = -1, client_email = email_text, generated_quote = st.session_state.quote_text_content, company_name = st.session_state["company"], user_name = st.session_state["user"], upload_file_type = st.session_state.file_type_of_quote)
+                st.write("Feedback received")
 
     diveder(1)
 
@@ -303,3 +230,14 @@ def generation_tab(company_of_user: str):
             """, 
             unsafe_allow_html=True
         )
+        col11, col22 = st.columns([4,1])
+        # Feedback 
+        with col11:
+            if st.button("👍 Approve", key = "approve_email"):
+                log_feedback_email(score = 1, client_email = email_text, generated_email = st.session_state.response_text, company_name = st.session_state["company"], user_name = st.session_state["user"])
+                st.write("Feedback received")
+        with col22:
+            if st.button("👎 Disapprove", key = "disapprove_email"):
+                log_feedback_email(score = -1, client_email = email_text, generated_email = st.session_state.response_text, company_name = st.session_state["company"], user_name = st.session_state["user"])
+                st.write("Feedback received")
+
