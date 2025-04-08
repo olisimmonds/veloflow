@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 from bs4 import BeautifulSoup
 from datetime import date
+from src.ai.web_scraper import crawl_website, extract_unique_sentences
 
 from src.app_config_functions import (
     get_company_documents, 
@@ -158,36 +159,20 @@ def quote_tab(company_name):
 def url_tab(company_name):
     st.subheader("Link relevant websites")
     web_url = st.text_input(label="Website URL")
+    timeout_input = st.number_input("Timeout (seconds)", help="Text scraping can take a while. Set a timeout and we will scrape as much as possible in that time. Please ensure the app remains open while scraping.", min_value=2, max_value=60, value=5)
 
     if st.button("Upload URL"):
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
-        }
-
-        # Send a GET request with headers
-        response = requests.get(web_url, headers=headers)
-
-        # Check if the request was successful
-        if response.status_code == 200:
-            # Parse the HTML content using BeautifulSoup
-            soup = BeautifulSoup(response.content, 'html.parser')
-
-            # Extract the content you need
-            # For example, extracting all paragraph text
-            paragraphs = soup.find_all('p')
-            web_content = ""
-            for paragraph in paragraphs:
-                web_content+=paragraph.get_text()
-        else:
-            st.warning(f"Failed to retrieve content. HTTP Status Code: {response.status_code}")
-
+        with st.spinner("Scraping website..."):
+            web_content = crawl_website(web_url, time_limit=timeout_input)
+            unique_sentences = extract_unique_sentences(web_content)
+            print(f"{unique_sentences=}")
         todays_date = date.today().strftime('%d/%m/%Y').split('/')
         file_name = f"{todays_date[1]}{todays_date[2]}_{web_url}"
 
         if check_filename_in_table(company_name, file_name):
             st.warning("URL already in knowlage base")
         else:
-            store_document_embedding(company_name, "url", file_name, web_content)
+            store_document_embedding(company_name, "url", file_name, unique_sentences)
 
 
     urls_added_to_kb = set(get_items_from_embedding_table(company_name, "url"))

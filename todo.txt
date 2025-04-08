@@ -1,5 +1,4 @@
-1)  website - go through website tabs
-    Edit quote in veloflow
+1)  Edit quote in veloflow
 2)  improve quote gen quality
 3)  add feedback tab with written feedback - lovable?
     host on server - fly.io, upgrade comunity cloud (snowflake), or move from streamlit
