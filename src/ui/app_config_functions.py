@@ -138,9 +138,12 @@ def upload_file_to_supabase(company, type, uploaded_file):
     else:
         st.error("Failed to upload file.")
 
-def get_company_documents(company, type, for_display = False):
+def get_company_documents(company, type, for_display = False, file_name = None):
     """Function to fetch files for a company"""
 
+    if file_name:
+        return supabase.storage.from_(BUCKET_NAME).get_public_url(f"{company}/{type}/{file_name}")
+    
     res = supabase.storage.from_(BUCKET_NAME).list(f"{company}/{type}")
 
     if res:

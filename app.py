@@ -51,7 +51,8 @@ set_up_session_states_init_to_false([
     "ai_comment_on_quote",
     "edited_quote_template",
     "edited_quote_template_bytes",
-    "quote_as_pdf"
+    "quote_as_pdf",
+    "quote_template"
 ])
 
 if "response_text" not in st.session_state:

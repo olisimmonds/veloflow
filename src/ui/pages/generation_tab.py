@@ -120,8 +120,6 @@ def generation_tab(company_of_user: str):
                     st.session_state["generating_email"] = True
                     
                     company_context = retrieve_relevant_context(company_of_user, email_text, word_limit=2000)
-                    print(f"{company_of_user=}")
-                    print(f"{company_context=}")
                     st.session_state.response_text = generate_response(email_text, company_context, st.session_state.context_from_user, st.session_state["user"])
                     st.session_state.email_in_mem = True
 
@@ -134,35 +132,34 @@ def generation_tab(company_of_user: str):
                     email_warining_message.markdown("<h3 style='color:red;'>Try again now</h3>", unsafe_allow_html=True)
 
     with cols_for_gen[1]:
-        if st.button("Generate Quote"):
-            with st.spinner("Generating Quote..."):
+        with st.popover("Generate Quote"):
+            st.markdown("**Instructions:** Select from existing quote templates or let us make one for you. You can also upload more templates to the knowledge base.")
+            quote_templates = get_company_documents(company_of_user, "quote_template", True)
+            template_options = ["Veloflow's Quote Template"] + quote_templates
+        
+            # Let user select a template
+            selected_template = st.selectbox(
+                "Select a quote template:",
+                template_options,
+                index=0
+            )
+            
+            generate = st.button("Generate Quote")
+
+            if generate:
                 if not st.session_state["generating_quote"]:
                     quote_warining_message.empty()
                     st.session_state["generating_quote"] = True
-                    
-                    company_context = retrieve_relevant_context(company_of_user, email_text, word_limit=2000)
-                    quote_template = get_company_documents(company_of_user, "quote_template")
-                    ######
 
-                    # Edit below for select button
+                    if selected_template=="Veloflow's Quote Template":
+                        st.session_state.quote_template = get_company_documents("default", "quote_template")[0]
+                    else:
+                        selected_template = selected_template.split("/")[-1]
+                        print(f"selected_template: {selected_template}")
+                        st.session_state.quote_template = get_company_documents(company_of_user, "quote_template", file_name=selected_template)
+            
+                    print(f"quote_template: {st.session_state.quote_template}")
 
-                    ######
-                    if len(quote_template)!=0:
-                        quote_template = get_company_documents("default", "quote_template")
-                    quote_template[0] = quote_template[0].rstrip('?')
-                    print(f"{quote_template[0]=}")
-                    quotes, st.session_state.file_type_of_quote, st.session_state.ai_comment_on_quote = generate_quote(quote_template[0], email_text, company_context, st.session_state.context_from_user, st.session_state["user"])
-                    
-                    if type(quotes) == tuple:
-                        st.session_state.edited_quote_template = quotes[0]
-                        st.session_state.quote_as_pdf = quotes[1]
-                    else: 
-                        st.session_state.edited_quote_template = quotes
-                    
-                    st.session_state.edited_quote_template_bytes = docx_to_bytes(st.session_state.edited_quote_template)
-                    st.session_state.quote_in_mem = True
-                    
-                    st.session_state["generating_quote"] = False
                 else: 
                     quote_warining_message.markdown("<h3 style='color:red;'>Please only press 'Generate Quote' once. \nWait a few seconds and then the button will become available again.</h3>", unsafe_allow_html=True)
                     time.sleep(2)
@@ -170,6 +167,24 @@ def generation_tab(company_of_user: str):
                     st.session_state["generating_quote"] = False
                     quote_warining_message.markdown("<h3 style='color:red;'>Try again now</h3>", unsafe_allow_html=True)
 
+            
+        if st.session_state["generating_quote"]:    
+            with st.spinner("Generating Quote..."):
+                company_context = retrieve_relevant_context(company_of_user, email_text, word_limit=2000)
+                
+                quotes, st.session_state.file_type_of_quote, st.session_state.ai_comment_on_quote = generate_quote(st.session_state.quote_template, email_text, company_context, st.session_state.context_from_user, st.session_state["user"])
+                
+                if type(quotes) == tuple:
+                    st.session_state.edited_quote_template = quotes[0]
+                    st.session_state.quote_as_pdf = quotes[1]
+                else: 
+                    st.session_state.edited_quote_template = quotes
+                
+                st.session_state.edited_quote_template_bytes = docx_to_bytes(st.session_state.edited_quote_template)
+                st.session_state.quote_in_mem = True
+                
+                st.session_state["generating_quote"] = False
+            
 
     if st.session_state.quote_in_mem:
         with cols_for_gen[0]:

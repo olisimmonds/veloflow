@@ -1,12 +1,12 @@
 add feedback buttons - use work inspo
-select quote, upload, or AI gen pop up
 website - go through website tabs
-suggestion box for editing pdfs directly?
+Edit quote in veloflow
 improve quote gen quality
 add feedback tab with written feedback - lovable?
 host on server - fly.io, upgrade comunity cloud (snowflake), or move from streamlit
 Make demo vid (testing as part of this)
 
+confirm dels to popobver
 Add info page - use word
 fix image to text
 set up dev/prod spaces - could just use git, multiple apps?
