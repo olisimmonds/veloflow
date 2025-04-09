@@ -242,7 +242,7 @@ def generate_quote(file_url, email_text, company_contex, user_contex, user_email
     log_generated_quote(client_email = email_text, generated_quote = extracted_text, company_name = st.session_state["company"], user_name = user_email, upload_file_type = file_type)
 
     if type(updated_docs) == tuple:
-        return (updated_doc, updated_docs[1]), file_type, requested_additional_context, extracted_text
+        return (updated_doc, updated_docs[1]), file_type, requested_additional_context, extracted_text, struct_and_replcments
     
     return updated_doc, file_type, requested_additional_context, extracted_text, struct_and_replcments
 
