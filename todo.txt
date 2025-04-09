@@ -1,6 +1,5 @@
-1)  Edit quote in veloflow
-show abdi
-2)  improve quote gen quality - currently works as good as lovable for pdf and docx, very easy to change for others
+1)  Improve edit quote in veloflow
+    improve quote gen quality - currently works as good as lovable for pdf and docx, very easy to change for others
     edit so that edits docs directly
     move about elements of UI
 3)  host on server - fly.io, upgrade comunity cloud (snowflake), or move from streamlit

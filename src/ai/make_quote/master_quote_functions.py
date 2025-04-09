@@ -208,7 +208,10 @@ def generate_quote(file_url, email_text, company_contex, user_contex, user_email
         pdf_file (str): The file path of the generated PDF.
     """
     # Run the document processing function (assumed to return updated_doc and file_type)
-    updated_docs, file_type, struct_and_replcments = process_document(file_url, email_text, company_contex, user_contex, user_email)
+    try:
+        updated_docs, file_type, struct_and_replcments = process_document(file_url, email_text, company_contex, user_contex, user_email)
+    except:
+        updated_docs, file_type, struct_and_replcments = process_document(file_url[:-1], email_text, company_contex, user_contex, user_email)
     
     if type(updated_docs) == tuple:
         updated_doc = updated_docs[0]
