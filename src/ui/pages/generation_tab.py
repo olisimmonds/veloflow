@@ -9,6 +9,7 @@ from src.app_config_functions import (
     retrieve_relevant_context,
     diveder
 )
+from src.ai.make_quote.edit_docx import generate_editable_document
 
 def docx_to_bytes(doc):
     bio = io.BytesIO()
@@ -89,7 +90,7 @@ def generation_tab(company_of_user: str):
             with st.spinner("Generating Quote..."):
                 company_context = retrieve_relevant_context(company_of_user, email_text, word_limit=2000)
                 
-                quotes, st.session_state.file_type_of_quote, st.session_state.ai_comment_on_quote, st.session_state.quote_text_content = generate_quote(st.session_state.quote_template, email_text, company_context, st.session_state.context_from_user, st.session_state["user"])
+                quotes, st.session_state.file_type_of_quote, st.session_state.ai_comment_on_quote, st.session_state.quote_text_content, st.session_state.quote_struct_and_replacments = generate_quote(st.session_state.quote_template, email_text, company_context, st.session_state.context_from_user, st.session_state["user"])
                 
                 if type(quotes) == tuple:
                     st.session_state.edited_quote_template = quotes[0]
@@ -165,6 +166,12 @@ def generation_tab(company_of_user: str):
             if st.button("👎 Disapprove", key = "disapprove_quote"):
                 log_feedback_quote(score = -1, client_email = email_text, generated_quote = st.session_state.quote_text_content, company_name = st.session_state["company"], user_name = st.session_state["user"], upload_file_type = st.session_state.file_type_of_quote)
                 st.write("Feedback received")
+
+        doc_structure, detected_replacements = st.session_state.quote_struct_and_replacments
+        generate_editable_document(doc_structure, detected_replacements, file_type)
+        if file_type.strip('.')[-1] == "docx":
+            doc_structure, detected_replacements = st.session_state.quote_struct_and_replacments
+            generate_editable_document(doc_structure, detected_replacements, file_type)
 
     diveder(1)
 

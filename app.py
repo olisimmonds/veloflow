@@ -53,7 +53,8 @@ set_up_session_states_init_to_false([
     "edited_quote_template_bytes",
     "quote_as_pdf",
     "quote_template",
-    "quote_text_content"
+    "quote_text_content",
+    "quote_struct_and_replacments"
 ])
 
 if "response_text" not in st.session_state:
