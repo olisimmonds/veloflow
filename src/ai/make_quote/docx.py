@@ -11,6 +11,7 @@ def extract_doc_structure_docx(doc):
     """
     Extract a structured representation of the document.
     Returns a list of document elements with their type, index information, and text.
+    Note: This currently only handles paragraphs and tables. Images and other objects remain untouched.
     """
     elements = []
     # Extract paragraphs with index
@@ -33,11 +34,23 @@ def extract_doc_structure_docx(doc):
                 })
     return elements
 
+def replace_text_in_paragraph(paragraph, search_text, replacement_text):
+    """
+    Iterates through the paragraph's runs to find and replace the search_text.
+    Replaces only the first occurrence while preserving the existing formatting.
+    """
+    for run in paragraph.runs:
+        if search_text in run.text:
+            run.text = run.text.replace(search_text, replacement_text, 1)
+            return True
+    return False
+
 def replace_text_in_docx(doc, replacements):
     """
     Iterates over replacement suggestions and applies them based on precise location.
     Each replacement object should include a 'location' key that details the document element location,
     along with 'original' and 'replacement' keys.
+    This version edits text at the run level, preserving formatting and leaving other objects (like images) intact.
     """
     for rep in replacements:
         loc = rep.get("location", {})
@@ -46,22 +59,22 @@ def replace_text_in_docx(doc, replacements):
         if loc.get("type") == "paragraph":
             idx = loc.get("index")
             if idx is not None and idx < len(doc.paragraphs):
-                p = doc.paragraphs[idx]
-                if original in p.text:
-                    p.text = p.text.replace(original, new_text, 1)
+                para = doc.paragraphs[idx]
+                if not replace_text_in_paragraph(para, original, new_text):
+                    print(f"'{original}' not found in paragraph {idx}")
         elif loc.get("type") == "table":
             ti = loc.get("table_index")
             ri = loc.get("row_index")
             ci = loc.get("col_index")
-            # Validate indices before replacing
             try:
                 cell = doc.tables[ti].rows[ri].cells[ci]
-                if original in cell.text:
-                    # Replace only the first occurrence
-                    for p in cell.paragraphs:
-                        if original in p.text:
-                            p.text = p.text.replace(original, new_text, 1)
-                            break
+                replaced = False
+                for para in cell.paragraphs:
+                    if replace_text_in_paragraph(para, original, new_text):
+                        replaced = True
+                        break
+                if not replaced:
+                    print(f"'{original}' not found in table cell {loc}")
             except IndexError:
                 print(f"Invalid table location: {loc}")
     return doc
@@ -69,11 +82,10 @@ def replace_text_in_docx(doc, replacements):
 def get_replacements_from_gpt_docx(doc_structure, email, company_context, user_context, user_email):
     """
     Uses GPT-4 (via the OpenAI API) to analyze the document structure and determine which fields need updating.
-    The prompt includes additional context and instructs the model to return a JSON list of objects.
-    Each object includes:
-      - 'location': an object with keys specifying the type and index info (for paragraphs: 'index'; for tables: 'table_index', 'row_index', 'col_index')
-      - 'original': the exact text snippet that should be updated.
-      - 'replacement': the new text to insert.
+    Returns a JSON list of objects with the keys:
+        - 'location' (dict): where the change should be applied
+        - 'original' (str): the exact text to update
+        - 'replacement' (str): the new text to insert
     """
     # Convert document structure to JSON string
     doc_structure_json = json.dumps(doc_structure, ensure_ascii=False, indent=2)
@@ -112,8 +124,6 @@ def get_replacements_from_gpt_docx(doc_structure, email, company_context, user_c
         Document structure:
         {doc_structure_json}
     """
-
-
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
@@ -132,4 +142,3 @@ def get_replacements_from_gpt_docx(doc_structure, email, company_context, user_c
         print("Error parsing GPT-4 response:", e)
         replacements = []
     return replacements
-

@@ -28,6 +28,7 @@ OPENAI_KEY = params.OPENAI_KEY
 client = OpenAI(api_key=OPENAI_KEY)
 
 from src.ai.make_quote.csv_xlsx import *
+from src.ai.make_quote.docx_dsc import *
 from src.ai.make_quote.docx import *
 from src.ai.make_quote.html import *
 from src.ai.make_quote.md import *
@@ -77,12 +78,33 @@ def process_document(file_url, email_text, compan_conx, user_context, user_email
     
     if ext == ".docx":
         # Process DOCX file
+
+        # source_doc = docx.Document(tmp_path)
+    
+        # # Extract full document structure
+        # doc_structure = extract_doc_structure(source_doc)
+        # print(f"Extracted Document Structure: {doc_structure}")
+        
+        # # Get revised quote blueprint from GPT
+        # blueprint = get_new_quote_blueprint(
+        #     doc_structure,
+        #     email_text,
+        #     compan_conx,
+        #     user_context,
+        #     user_email
+        # )
+        # print("Blueprint for New Quote:", blueprint)
+        # replacements = blueprint
+        # # Build a new document from the AI-generated blueprint
+        # updated_doc = build_doc_from_blueprint(blueprint, source_doc)
+
         doc = docx.Document(tmp_path)
         doc_structure = extract_doc_structure_docx(doc)
         print(f"{doc_structure=}")
         replacements = get_replacements_from_gpt_docx(doc_structure, email_text, compan_conx, user_context, user_email)
         print("Detected replacements:", replacements)
         updated_doc = replace_text_in_docx(doc, replacements)
+
         # Optionally, you can save to a new file if needed:
         # updated_doc.save("final_quote.docx")
     
