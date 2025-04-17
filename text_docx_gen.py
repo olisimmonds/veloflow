@@ -77,115 +77,155 @@ def remove_irrelevant_info(tmp_path: str, context: dict) -> None:
 
     doc.save(tmp_path)
 
+
 # def insert_placeholders(tmp_path: str, context: dict) -> None:
 #     """
 #     Opens the DOCX file from tmp_path and processes every paragraph and table cell.
-#     In each text section, call the LLM to insert standardized placeholders where dynamic content should be updated.
-#     The placeholders are of the format: {{PLACEHOLDER: description}}.
+#     In each text section, calls the LLM to insert standardized placeholders where dynamic content should be updated.
+#     The placeholders are of the format: ---PLACEHOLDER: description---.
 #     The document is modified in place without altering any formatting.
 #     """
 #     doc = Document(tmp_path)
     
+#     def process_runs(paragraph):
+#         for run in paragraph.runs:
+#             text = run.text
+#             if text.strip():
+#                 prompt = (
+#                     f"""
+#                     You are given a snippet from a business quote document. Insert standardized placeholders in the text where dynamic content
+#                     (such as client email, product descriptions, etc.) should be updated, based on the context provided. Do not remove universally 
+#                     relevant information such as company details, terms and conditions, or any textual formatting markers. The placeholders must 
+#                     be in the exact format ---PLACEHOLDER: description---. Preserve the formatting, punctuation, and overall structure exactly. 
+#                     Do not add extra content at all, only replace with placeholders while keeping the other text exactly the same. Do not reply 
+#                     with anything but the text and its edits - no exceptions! If no text is provided then say nothing at all.
+
+#                     For example if the text looked like:
+#                         'Product title: xyz'
+#                     You might return something like:
+#                         'Product title: ---PLACEHOLDER: product title---'
+#                     Text: {text}
+#                     """
+#                 )
+#                 new_text = call_openai(prompt)
+#                 new_text = ensure_str(new_text)
+#                 if new_text:
+#                     run.text = new_text
+
 #     # Process paragraphs.
 #     for para in doc.paragraphs:
-#         text = para.text
-#         if text.strip():
-#             prompt = (
-#                 f"""
-#                 You are given a snippet from a business quote document. Insert standardized placeholders in the text where dynamic content
-#                 (such as client email, product descriptions, etc.) should be updated, based on the context provided. Do not remove universally 
-#                 relevant information such as company details, terms and conditions, or any textual formatting markers. The placeholders must 
-#                 be in the exact format ---PLACEHOLDER: description---. Preserve the formatting, punctuation, and overall structure exactly. 
-#                 Do not add extra content at all, only replace with placeholders whiles keeping the other text the exact same. Do not reply 
-#                 with anything but the text and it's edits - no exceptions! If no text is provided then say nothing at all.
-
-#                 For example if the text looked like:
-#                     'Product title: xyz'
-#                 You might return something like:
-#                     'Product title: ---PLACEHOLDER: product title---'
-#                 Text: {text}
-#                 """
-#             )
-#             new_text = call_openai(prompt)
-#             new_text = ensure_str(new_text)
-#             if new_text:
-#                 para.text = new_text
-
+#         process_runs(para)
+    
 #     # Process each cell in all tables.
 #     for table in doc.tables:
 #         for row in table.rows:
 #             for cell in row.cells:
-#                 cell_text = cell.text
-#                 if cell_text.strip():
-#                     prompt = (
-#                         f"""
-#                         You are given a snippet from a business quote document. Insert standardized placeholders in the text where dynamic content
-#                         (such as client email, product descriptions, etc.) should be updated, based on the context provided. Do not remove universally 
-#                         relevant information such as company details, terms and conditions, or any textual formatting markers. The placeholders must 
-#                         be in the exact format ---PLACEHOLDER: description---. Preserve the formatting, punctuation, and overall structure exactly. 
-#                         Do not add extra content at all, only replace with placeholders whiles keeping the other text the exact same. Do not reply 
-#                         with anything but the text and it's edits - no exceptions! If no text is provided then say nothing at all.
+#                 # A cell can contain multiple paragraphs.
+#                 for para in cell.paragraphs:
+#                     process_runs(para)
 
-#                         For example if the text looked like:
-#                             'Product title: xyz'
-#                         You might return something like:
-#                             'Product title: ---PLACEHOLDER: product title---'
-#                         Text: {text}
-#                         """
-#                     )
-#                     new_cell_text = call_openai(prompt)
-#                     new_cell_text = ensure_str(new_cell_text)
-#                     if new_cell_text:
-#                         cell.text = new_cell_text
+#     base, ext = os.path.splitext(tmp_path)
+#     new_path = f"{base}_placeholders{ext}"
+#     doc.save(new_path)
 
-#     doc.save(tmp_path)
-def insert_placeholders(tmp_path: str, context: dict) -> None:
+# def strip_special_chars(text: str) -> str:
+#     """Removes all non-alphanumeric characters for safe dict comparison."""
+#     return re.sub(r'[^a-zA-Z0-9]', '', text)
+
+def identify_placeholder_locations(tmp_path: str, context: dict) -> list[str]:
     """
-    Opens the DOCX file from tmp_path and processes every paragraph and table cell.
-    In each text section, calls the LLM to insert standardized placeholders where dynamic content should be updated.
-    The placeholders are of the format: ---PLACEHOLDER: description---.
-    The document is modified in place without altering any formatting.
+    Opens the DOCX file and extracts all text as a single string.
+    Sends the entire text to the LLM to identify snippets that need placeholders.
+    Returns a list of strings (exact text snippets) to be replaced or edited.
     """
     doc = Document(tmp_path)
-    
-    def process_runs(paragraph):
-        for run in paragraph.runs:
-            text = run.text
-            if text.strip():
-                prompt = (
-                    f"""
-                    You are given a snippet from a business quote document. Insert standardized placeholders in the text where dynamic content
-                    (such as client email, product descriptions, etc.) should be updated, based on the context provided. Do not remove universally 
-                    relevant information such as company details, terms and conditions, or any textual formatting markers. The placeholders must 
-                    be in the exact format ---PLACEHOLDER: description---. Preserve the formatting, punctuation, and overall structure exactly. 
-                    Do not add extra content at all, only replace with placeholders while keeping the other text exactly the same. Do not reply 
-                    with anything but the text and its edits - no exceptions! If no text is provided then say nothing at all.
+    full_text = []
 
-                    For example if the text looked like:
-                        'Product title: xyz'
-                    You might return something like:
-                        'Product title: ---PLACEHOLDER: product title---'
-                    Text: {text}
-                    """
-                )
-                new_text = call_openai(prompt)
-                new_text = ensure_str(new_text)
-                if new_text:
-                    run.text = new_text
-
-    # Process paragraphs.
+    # Extract all text from paragraphs
     for para in doc.paragraphs:
-        process_runs(para)
-    
-    # Process each cell in all tables.
+        full_text.append(para.text)
+
+    # Extract all text from tables
     for table in doc.tables:
         for row in table.rows:
             for cell in row.cells:
-                # A cell can contain multiple paragraphs.
                 for para in cell.paragraphs:
-                    process_runs(para)
+                    full_text.append(para.text)
 
-    doc.save(tmp_path)
+    # Need to remove insidencies of tripple quoates
+
+    prompt_text = """
+    You are reviewing a complete quote document to decide where placeholders should be inserted.
+    The goal is to identify snippets of text that represent client-specific or dynamic content.
+    The input will be a list of runs. 
+    Consider the context of the whole document to remove stuff and replace it with placeholders 
+    but you can use the list structure to structure your output dict.
+
+    Return ONLY a dict of exact snippets (copied from the text) that either:
+    - Should be fully replaced with a placeholder.
+    - Should have a placeholder inserted within them.
+    If no change is needed for some text, do not include it in the output.
+    Maintain the exact casing, punctuation, and structure.
+
+    Use the format: 
+    Original snippet: Edited snippet with ---PLACEHOLDER: description---
+    for each item of the dict but with one important detail. 
+    THE KEYS AND ITEMS NEED TO BE WRAPED IN TRIPPLE QUOTATIONS.
+    This is because I need the punctuation to stay the same so I can't remove it but I also don't
+    want to mess up the format of the output dictionary.
+    I can't show eaxtly how I want the output to look in this prompt as that will mess up my f string.
+    So potential output will look something like:
+    {\"\"\"Product: xyz\"\"\": \"\"\"Product: ---PLACEHOLDER: product---\"\"\", ...}
+    But without the back slashes.
+
+    """
+    
+    prompt = f"""
+    {prompt_text}
+    Document text:
+    {full_text}
+    """
+    
+    placeholder_instructions = call_openai(prompt)
+    # print(raw_response)
+    # placeholder_instructions = ensure_str(raw_response).splitlines()
+    
+    return placeholder_instructions  
+
+def apply_placeholder_edits(tmp_path: str, context: dict) -> None:
+    """
+    Opens the DOCX file, and for each text run, checks if it matches an original snippet.
+    If so, replaces it with the edited version while preserving formatting.
+    """
+    placeholder_instructions = identify_placeholder_locations(tmp_path, None)
+    import ast
+    print(placeholder_instructions)
+    print(type(placeholder_instructions))
+    placeholder_instructions = ast.literal_eval(placeholder_instructions)
+    print(placeholder_instructions)
+    
+    print(placeholder_instructions.keys())
+    doc = Document(tmp_path)
+
+    def replace_run_text(run):
+        original_text = run.text.strip()
+        if original_text in placeholder_instructions:
+            run.text = placeholder_instructions[original_text]
+
+    for para in doc.paragraphs:
+        for run in para.runs:
+            replace_run_text(run)
+
+    for table in doc.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                for para in cell.paragraphs:
+                    for run in para.runs:
+                        replace_run_text(run)
+
+    base, ext = os.path.splitext(tmp_path)
+    new_path = f"{base}_placeholders_applied{ext}"
+    doc.save(new_path)
 
 def fill_placeholders(tmp_path: str, context: dict) -> None:
     """
@@ -229,7 +269,9 @@ def fill_placeholders(tmp_path: str, context: dict) -> None:
                 if new_cell_text != cell_text:
                     cell.text = new_cell_text
 
-    doc.save(tmp_path)
+    base, ext = os.path.splitext(tmp_path)
+    new_path = f"{base}_fill{ext}"
+    doc.save(new_path)
 
 def save_intermediate(tmp_path: str, step: str) -> None:
     """
@@ -267,8 +309,7 @@ class LandGraphAgent:
         # save_intermediate(tmp_path, "step1_removed")
         
         print("Step 2: Inserting placeholders in document.")
-        insert_placeholders(tmp_path, self.context)
-        save_intermediate(tmp_path, "step2_placeholders")
+        apply_placeholder_edits(tmp_path, self.context)
         
         # print("Step 3: Filling placeholders with provided dynamic content.")
         # fill_placeholders(tmp_path, self.context)
